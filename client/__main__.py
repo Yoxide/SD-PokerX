@@ -1,12 +1,17 @@
 import pygame
 import socket
 import json
+import os
 
 pygame.init()
 
 WIDTH, HEIGHT = 800, 600
 GREEN = (34, 139, 34)
 CARD_WIDTH, CARD_HEIGHT = 100, 150
+
+# Nota: Estas duas diretórias são para resolver o problema do path das cartas (talvez temporariamente)
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+CARDS_DIR = os.path.join(BASE_DIR, "..", "cards")
 
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Texas Hold'em Poker")
@@ -23,9 +28,13 @@ player_hand = game_data["hand"]
 community_cards = game_data["community_cards"]
 
 # Carregar as imagens das cartas e meter no tamanho pretendido
-card_images = {f"{rank}-{suit}": pygame.transform.scale(
-    pygame.image.load(f"cards/{rank}-{suit}.png"), (CARD_WIDTH, CARD_HEIGHT))
-    for rank in "23456789TJQKA" for suit in "CDHS"}
+card_images = {
+    f"{rank}-{suit}": pygame.transform.scale(
+        pygame.image.load(os.path.join(CARDS_DIR, f"{rank}-{suit}.png")),
+        (CARD_WIDTH, CARD_HEIGHT)
+    )
+    for rank in "23456789TJQKA" for suit in "CDHS"
+}
 
 running = True
 while running:

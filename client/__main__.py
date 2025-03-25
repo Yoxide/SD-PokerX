@@ -55,5 +55,5 @@ while running:
     pygame.display.flip()
 
 client.send("quit".encode())  # Notifica o servidor antes de sair
-pygame.quit()
+pygame.quit() # Sair do pygame
 client.close()

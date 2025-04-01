@@ -1,0 +1,47 @@
+#ligação cliente ao servidor
+
+#conexão
+(cliente)
+CONN_OP
+Enviam o nome ao servidor
+<-- servidor responde com o número do jogador
+
+# Jogar
+(cliente)
+BET_OP
+indicar o tamanho da aposta (int)  """ Pode ser qualquer valor que não exceda o saldo do jogador
+<-- servidor responde com a distribuição das cartas
+
+(cliente)
+HIT_OP
+fazer aposta (Class Aposta) """ Pode apostar ou desistir da rodada
+<-- servidor responde com as primeiras 3 cartas
+
+
+loop while cartas reveladas < 5 ou enquanto todos não desistirem
+(cliente)
+HIT_OP
+fazer aposta (Class Aposta) """ Pode apostar, passar ou desistir da rodada
+<-- servidor responde com mais uma carta se houver aposta, caso contrário revela o resultado
+
+
+
+
+
+
+Por exemplo:
+- Entrar no jogo
+- Servidor distribui as cartas
+- Decisão: Aposto ou Desisto
+- Servidor revela as 3 primeiras cartas
+
+LOOP
+- Decisão: Aposto, Passo ou Desisto
+- Servidor: Revela mais uma carta
+- Decisão: Aposto, Passo ou Desisto
+- Servidor: Revela ainda mais uma carta
+- Decisão final: Aposto, Passo ou Desisto
+
+
+
+

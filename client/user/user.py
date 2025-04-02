@@ -2,9 +2,18 @@ from client.stub import interface as processar
 
 
 class User:
-    def __init__(self, inter: processar ):
+    def __init__(self, inter: processar):
         self.processar = inter
+        self.chips = 100
+        self.hand = []
 
+    def aposta(self, valor_aposta: int):
+        self.chips -= valor_aposta
+        return self.chips
+
+
+
+    """
     def valores_soma(self)->tuple:
         res1 = int(input("Introduz o primeiro valor para somar:"))
         res2 = int(input("Introduz o segundo valor para somar:"))
@@ -14,7 +23,7 @@ class User:
         res1 = int(input("Introduz o primeiro valor para subtrair:"))
         res2 = int(input("Introduz o segundo valor para subtrair:"))
         return (res1, res2)
-
+"""
     def exec(self):
         print("Olá. Queres somar?")
         (a, b) = self.valores_soma()

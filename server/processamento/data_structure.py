@@ -21,9 +21,7 @@ class Data_Structure:
         """ Método para "dar" as 5 cartas comunitárias"""
         return [self._deck.pop() for _ in range(5)]  # 5 cartas comunitárias
 
-
-
-
-
-
+    def player_choice(self):
+        """ Método para verificar a ação do jogador"""
+        
 

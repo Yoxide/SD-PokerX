@@ -2,7 +2,7 @@ import threading
 from server.processamento import somar, subtracao
 import middleware.middleware as middle
 import server
-from server.skeleton import COMMAND_SIZE, INT_SIZE, ADD_OP, SYM_OP, SUB_OP, BYE_OP
+from server.skeleton import COMMAND_SIZE, INT_SIZE, HIT_OP, PAS_OP, FLD_OP, BYE_OP
 
 class ThreadCliente(threading.Thread):
 
@@ -67,24 +67,20 @@ class ThreadCliente(threading.Thread):
         while not last_request:
             #request_type = self.receive_str(self.connection,COMMAND_SIZE)
             request_type = self.receive_str(COMMAND_SIZE)
-            if request_type == ADD_OP:
+            if request_type == HIT_OP:
+                a = self.receive_int(INT_SIZE)
+                print("O jogador vai a jogo")
+                #result = self.som.operacao(a,b)
+                #self.send_int(result,INT_SIZE)
+            elif request_type == PAS_OP:
                 a = self.receive_int(INT_SIZE)
                 b = self.receive_int(INT_SIZE)
-                #a = self.receive_int(self.connection,INT_SIZE)
-                #b = self.receive_int(self.connection,INT_SIZE)
-                print("Pediram para somar:",a,"+",b)
-                result = self.som.operacao(a,b)
-                self.send_int(result,INT_SIZE)
-                #self.send_int(self.connection,result, INT_SIZE)
-            elif request_type == SUB_OP:
-                a = self.receive_int(INT_SIZE)
-                b = self.receive_int(INT_SIZE)
-                #a = self.receive_int(self.connection,INT_SIZE)
-                #b = self.receive_int(self.connection,INT_SIZE)
-                print("Pediram para subtrair:",a,"-",b)
+                print("O jogador vai passar")
                 result = self.sub.operacao(a,b)
                 self.send_int(result,INT_SIZE)
                 #self.send_int(self.connection,result, INT_SIZE)
+            elif request_type == FLD_OP:
+                print("O jogador desistiu da rodada!")
             elif request_type == BYE_OP:
                 print("Client ",self.address," disconnected!")
                 self.contador.decrementa()

@@ -7,7 +7,7 @@ class User:
         self.chips = 100
         self.hand = []
 
-    def aposta(self):
+    def aposta(self) -> int:
         valor_aposta = int(input("Introduz o valor da aposta:"))
         self.chips -= valor_aposta
         return self.chips
@@ -26,7 +26,7 @@ class User:
 """
     def exec(self):
         print("Vamos apostar? Anda daí!")
-        a = self.aposta
+        a = self.aposta()
         # quero fazer  soma sem que se saiba que ela não é feita no cliente!
         res = self.processar.aposta(a)
         print("O tua aposta é:", res)

@@ -2,7 +2,7 @@
 import middleware.middleware as middle
 import client
 
-from client.stub import COMMAND_SIZE, INT_SIZE, ADD_OP, SYM_OP, SUB_OP, BYE_OP
+from client.stub import COMMAND_SIZE, INT_SIZE, HIT_OP, PAS_OP, FLD_OP, BYE_OP
 
 
 class Interface:
@@ -54,20 +54,12 @@ class Interface:
     #     data = connect.recv(n_bytes)
     #     return int.from_bytes(data, byteorder='big', signed=True)
 
-    def soma(self,a: int, b: int) -> int:
-        self.send_str(ADD_OP)
-        self.send_int(a,INT_SIZE)
-        self.send_int(b,INT_SIZE)
+
+    def aposta(self, a: int) -> int:
+        self.send_str(HIT_OP)
+        self.send_int(a, INT_SIZE)
         res = self.receive_int(INT_SIZE)
         return res
-
-    def subtrai(self,a: int, b: int) -> int:
-        self.send_str(SUB_OP)
-        self.send_int(a,INT_SIZE)
-        self.send_int(b,INT_SIZE)
-        res = self.receive_int(INT_SIZE)
-        return res
-
 
     # def exec(self):
     #     # Operação de soma

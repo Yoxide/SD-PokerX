@@ -7,10 +7,10 @@ class User:
         self.chips = 100
         self.hand = []
 
-    def aposta(self, valor_aposta: int):
+    def aposta(self):
+        valor_aposta = int(input("Introduz o valor da aposta:"))
         self.chips -= valor_aposta
         return self.chips
-
 
 
     """
@@ -25,12 +25,11 @@ class User:
         return (res1, res2)
 """
     def exec(self):
-        print("Olá. Queres somar?")
-        (a, b) = self.valores_soma()
+        print("Vamos apostar? Anda daí!")
+        a = self.aposta
         # quero fazer  soma sem que se saiba que ela não é feita no cliente!
-        res = self.processar.soma(a,b)
-        print("O valor da soma é:", res)
-
+        res = self.processar.aposta(a)
+        print("O tua aposta é:", res)
         print("Olá. Queres subtrair?")
         (a, b) = self.valores_subtracao()
         # quero fazer  soma sem que se saiba que ela não é feita no cliente!

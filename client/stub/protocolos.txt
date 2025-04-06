@@ -14,14 +14,14 @@ indicar o tamanho da aposta (int)  """ Pode ser qualquer valor que não exceda o
 
 (cliente)
 HIT_OP
-fazer aposta (Class Aposta) """ Pode apostar ou desistir da rodada
+fazer aposta (HIT_OP ou FOLD_OP) """ Pode apostar ou desistir da rodada
 <-- servidor responde com as primeiras 3 cartas
 
 
 loop while cartas reveladas < 5 ou enquanto todos não desistirem
 (cliente)
 HIT_OP
-fazer aposta (Class Aposta) """ Pode apostar, passar ou desistir da rodada
+fazer aposta (HIT_OP ou FLD_OP ou PAS_OP) """ Pode apostar, passar ou desistir da rodada
 <-- servidor responde com mais uma carta se houver aposta, caso contrário revela o resultado
 
 

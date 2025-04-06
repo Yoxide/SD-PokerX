@@ -55,7 +55,7 @@ class Interface:
     #     return int.from_bytes(data, byteorder='big', signed=True)
 
 
-    def aposta(self, a: int) -> int:
+    def bet(self, a: int) -> int:
         self.send_str(HIT_OP)
         self.send_int(a, INT_SIZE)
         res = self.receive_int(INT_SIZE)

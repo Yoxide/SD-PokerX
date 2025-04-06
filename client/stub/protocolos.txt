@@ -10,19 +10,19 @@ Enviam o nome ao servidor
 (cliente)
 BET_OP
 indicar o tamanho da aposta (int)  """ Pode ser qualquer valor que não exceda o saldo do jogador
-<-- servidor responde com a distribuição das cartas
+<-- servidor responde com a distribuição das cartas (lista de string)
 
 (cliente)
 HIT_OP
-fazer aposta (HIT_OP ou FOLD_OP) """ Pode apostar ou desistir da rodada
-<-- servidor responde com as primeiras 3 cartas
+fazer aposta (int) """ Pode apostar ou desistir da rodada
+<-- servidor responde com as primeiras 3 cartas (lista de strings)
 
 
-loop while cartas reveladas < 5 ou enquanto todos não desistirem
+loop while cartas reveladas < 5 ou enquanto todos não desistirem:
 (cliente)
 HIT_OP
-fazer aposta (HIT_OP ou FLD_OP ou PAS_OP) """ Pode apostar, passar ou desistir da rodada
-<-- servidor responde com mais uma carta se houver aposta, caso contrário revela o resultado
+fazer aposta (int) """ Pode apostar, passar ou desistir da rodada
+<-- servidor responde com mais uma carta se houver aposta (string), caso contrário revela o resultado (object, dict)
 
 
 

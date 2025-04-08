@@ -1,5 +1,5 @@
 import random
-
+from player import Player
 """
 _ p2 _
 p3 _ p4
@@ -26,12 +26,15 @@ class Data_Structure:
         self._ranks = "23456789TJQKA"
         self._suits = "CDHS"
         self._deck = [f"{rank}-{suit}" for rank in self._ranks for suit in self._suits]
-        self._players = []
+        self._players = {}
         self._community_cards = []
-        self._bet = 0
+        self._min_bet = 0
         self._game = {}
-        self._p1 = ""
-        self._p2 = ""
+        #self._p1 = ""
+        #self._p2 = ""
+        self._players["0"] = Player()
+        self._players["1"] = Player()
+
 
     def return_data(self):
         """Retorna o estado do jogo"""
@@ -58,9 +61,11 @@ class Data_Structure:
         """ Método para "dar" as 5 cartas comunitárias"""
         return [self._deck.pop() for _ in range(5)]  # 5 cartas comunitárias
 
-    def player_choice(self, choice: int):
+    def player_choice(self, pl:int, choice: int):
         """ Método para verificar a ação do jogador"""
+        self.player[chr(pl)].set_state(choice)
         if choice == HIT:
+
             pass
         elif choice == FOLD:
             pass

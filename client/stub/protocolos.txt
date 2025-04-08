@@ -8,10 +8,14 @@ Enviam o nome ao servidor
 
 # Jogar
 (cliente)
+DIST_OP
+Cliente pede distribuicao
+<- Servidor retorna as cartas
+<- ok (É a vez de eu jogar)
 BET_OP
 indicar o tamanho da aposta (int)  """ Pode ser qualquer valor que não exceda o saldo do jogador
 <-- servidor responde com a distribuição das cartas (lista de string)
-
+<- ok
 (cliente)
 HIT_OP
 fazer aposta (int) """ Pode apostar ou desistir da rodada

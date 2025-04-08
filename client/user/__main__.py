@@ -2,7 +2,7 @@ from client.stub import interface
 import user
 
 # PORT e SERVER ADDRESS
-PORT = 35000
+PORT = 35001
 SERVER_ADDRESS = "localhost"
 
 def main():

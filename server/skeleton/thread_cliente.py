@@ -1,17 +1,19 @@
 import threading
 from server.processamento import somar, subtracao
 import middleware.middleware as middle
+from server.processamento import game_state
 import server
-from server.skeleton import COMMAND_SIZE, INT_SIZE, HIT_OP, PAS_OP, FLD_OP, BYE_OP
+from server.skeleton import COMMAND_SIZE, DIST_OP, INT_SIZE, HIT_OP, PAS_OP, FLD_OP, BYE_OP
 
 class ThreadCliente(threading.Thread):
 
 #    def __init__(self,connection, address, contador):
-    def __init__(self,socket: middle.Socket, contador):
+    def __init__(self,socket: middle.Socket, contador, gamestate: game_state.GameState):
 
         threading.Thread.__init__(self)
         self._socket = socket
         self.contador = contador
+        self.gamestate = gamestate
         #self.connection = connection
         self.address = self._socket.get_address()
         self.port = self._socket.get_port()
@@ -29,8 +31,8 @@ class ThreadCliente(threading.Thread):
     def receive_str(self, n_bytes: int) -> str:
         return self._socket.receive_str(n_bytes)
 
-    def send_str(self):
-        self._socket.send_str()
+    def send_str(self, string: str):
+        self._socket.send_str(string)
 # ---------------------- interaction with sockets ------------------------------
 #     def receive_int(self,connection, n_bytes: int) -> int:
 #         """
@@ -65,8 +67,25 @@ class ThreadCliente(threading.Thread):
         last_request = False
         # Recebe messagens...
         while not last_request:
+
+            # CONEXAO  Recebem o nome do jogador e retornam o número
+            self.player_number = number
             #request_type = self.receive_str(self.connection,COMMAND_SIZE)
             request_type = self.receive_str(COMMAND_SIZE)
+            if request_type == DIST_OP:
+                self.gamestate.increment_state()
+                #a = self.receive_int(INT_SIZE)
+                # Pedir cartas ao data_structure com indicacao do nr_jogador
+                self.send_str(cartas)
+                while self.player_number != self.gamestate.actual_player() :
+                    pass
+                self.send_str(OK_OP)
+                    #waiting for player turn
+                    #sleep for 1.0 s
+                print("Envio a distribuição")
+                #result = self.som.operacao(a,b)
+    #            #self.send_int(result,INT_SIZE)
+
             if request_type == HIT_OP:
                 a = self.receive_int(INT_SIZE)
                 print("O jogador vai a jogo")

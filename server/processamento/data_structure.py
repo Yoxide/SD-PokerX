@@ -1,5 +1,5 @@
 import random
-from player import Player
+from server.processamento.player import Player
 """
 _ p2 _
 p3 _ p4

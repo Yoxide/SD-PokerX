@@ -1,4 +1,4 @@
-from player import Player
+from server.processamento.player import Player
 
 
 class GameState:

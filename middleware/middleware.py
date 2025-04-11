@@ -1,6 +1,7 @@
 import socket
 from middleware import COMMAND_SIZE, INT_SIZE, ADD_OP, SYM_OP, SUB_OP, BYE_OP
 from typing import Self
+import json
 
 class Socket:
 
@@ -41,6 +42,30 @@ class Socket:
     def receive_int(self, n_bytes:int) -> int:
         data = self.connection.recv(n_bytes)
         return int.from_bytes(data, byteorder='big', signed=True)
+
+    def send_list(self, value: list) -> None:
+        """
+        :param value: The list of strings to be sent
+        :return: None
+        """
+        # Serialize the list into a JSON string
+        list_str = json.dumps(value)
+
+        # Send the serialized list using send_str
+        self.send_str(list_str)
+
+    def receive_list(self, n_bytes: int) -> list:
+        """
+        :param n_bytes: The number of bytes to read from the current connection
+        :return: The deserialized list of strings
+        """
+        # Receive the serialized list string using receive_str
+        list_str = self.receive_str(n_bytes)
+
+        # Deserialize the string back into a list using JSON
+        list_of_strings = json.loads(list_str)
+
+        return list_of_strings
 
     def close(self):
         self.connection.close()

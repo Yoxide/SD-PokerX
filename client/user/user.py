@@ -1,17 +1,17 @@
 from client.stub import interface as processar
+from server.processamento.player import Player
 
 
 class User:
     def __init__(self, inter: processar):
         self.processar = inter
-        self.chips = 100
-        self.hand = []
-        self.current_bet = 0
+        self.player = Player()
 
-    def bet(self) -> int:
-        valor_aposta = int(input("Introduz o valor da aposta:"))
-        self.chips -= valor_aposta
-        return self.chips
+
+
+    def bet_value(self):
+        valor_aposta = int(input("Introduz o valor da aposta: "))
+        return valor_aposta
 
 
     """
@@ -26,13 +26,26 @@ class User:
         return (res1, res2)
 """
     def exec(self):
-        print("Vamos apostar? Anda daí!")
-        a = self.bet()
-        # quero fazer a aposta sem que se saiba que ela não é feita no cliente!
-        res = self.processar.bet(a)
+        option = int(input("Queres apostar ou desistir?\n1-Apostar\n2-Desistir\n"))
+        match option:
+            case 1:
+                print("Vamos apostar? Anda daí!")
+                b_value = self.bet_value()
+                # quero fazer a aposta sem que se saiba que ela não é feita no cliente!
+                res = self.processar.bet(b_value)
+                print(f"Apostaste {res} fichas!")
+                print(f"Aqui estão as tuas cartas: {self.player.hand}")
+            case 2:
+                print("Desististe da rodada! Agora espera pela próxima!")
+                self.processar.fold()
+
+            case _:
+                print("Escolha inválida!")
+        """
         print("O tua aposta é:", res)
         print("Olá. Queres subtrair?")
         (a, b) = self.valores_subtracao()
         # quero fazer  soma sem que se saiba que ela não é feita no cliente!
         res = self.processar.subtrai(a,b)
         print("O valor da soma é:", res)
+"""

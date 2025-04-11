@@ -3,9 +3,12 @@ class Player:
     Classe que representa um jogador
     """
     def __init__(self):
-        self._state =""
+        self._state = ""
         self._bets = []
         self._name = ""
+        self.chips = 100
+        self.hand = []
+        self.current_bet = 0
 
     def set_state(self, state:int):
         self._state = state
@@ -18,3 +21,13 @@ class Player:
 
     def set_name(self, name:str):
         self._name = name
+
+    def get_hand(self):
+        return self.hand
+
+    def add_to_hand(self, card:str):
+        self.hand.append(card)
+
+    def bet(self, valor_aposta: int) -> int:
+        self.chips -= valor_aposta
+        return valor_aposta

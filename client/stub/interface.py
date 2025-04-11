@@ -1,8 +1,9 @@
 #import socket
 import middleware.middleware as middle
 import client
+import json
 
-from client.stub import COMMAND_SIZE, INT_SIZE, HIT_OP, PAS_OP, FLD_OP, BYE_OP
+from client.stub import COMMAND_SIZE, INT_SIZE, HIT_OP, PAS_OP, FLD_OP, BYE_OP, LIST_SIZE
 
 
 class Interface:
@@ -35,6 +36,16 @@ class Interface:
     def receive_int(self,n_bytes: int) -> int:
         return self._socket.receive_int(n_bytes)
 
+    def send_list(self, string_list: list):
+        # Convert the list to a JSON string
+        return self._socket.send_list(string_list)
+
+    def receive_list(self, n_bytes: int):
+        # Receive the string from the server
+        return self._socket.receive_list(n_bytes)
+
+        # Convert the string back into a list using JSON
+
     # ----- enviar e receber strings ----- #
     # def receive_str(self,connect, n_bytes: int) -> str:
     #     """
@@ -55,11 +66,18 @@ class Interface:
     #     return int.from_bytes(data, byteorder='big', signed=True)
 
 
-    def bet(self, a: int) -> int:
+    def bet(self, b_value: int) -> int:
         self.send_str(HIT_OP)
-        self.send_int(a, INT_SIZE)
+        self.send_int(b_value, INT_SIZE)
         res = self.receive_int(INT_SIZE)
+        received_cards = self.receive_list(LIST_SIZE)
         return res
+
+    def fold(self) -> int:
+        self.send_str(FLD_OP)
+        #self.send_int(a, INT_SIZE)
+        #res = self.receive_int(INT_SIZE)
+        return 0
 
     # def exec(self):
     #     # Operação de soma

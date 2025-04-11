@@ -1,5 +1,6 @@
 COMMAND_SIZE = 9
 INT_SIZE = 8
+LIST_SIZE = 12
 HIT_OP = "hit      "
 PAS_OP = "pas      "
 FLD_OP = "fld      "

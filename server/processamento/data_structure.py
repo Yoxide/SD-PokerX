@@ -53,9 +53,12 @@ class Data_Structure:
         """ Método para baralhar as cartas"""
         random.shuffle(self._deck)
 
-    def deal_hand(self):
-        """ Método para "dar" duas cartas a um jogador """
-        return [self._deck.pop(), self._deck.pop()]
+    def deal_hand(self, p: int, n: int):
+        """ Método para "dar" n cartas a um jogador """
+        player = self._players[f"{p}"]
+        for _ in range(n):
+            player.add_to_hand(self._deck.pop())
+        print(player.hand)
 
     def deal_community_cards(self):
         """ Método para "dar" as 5 cartas comunitárias"""
@@ -63,9 +66,8 @@ class Data_Structure:
 
     def player_choice(self, pl:int, choice: int):
         """ Método para verificar a ação do jogador"""
-        self.player[chr(pl)].set_state(choice)
+        self._players[chr(pl)].set_state(choice)
         if choice == HIT:
-
             pass
         elif choice == FOLD:
             pass

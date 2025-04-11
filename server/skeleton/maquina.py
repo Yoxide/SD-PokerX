@@ -2,6 +2,9 @@ import socket
 import thread_cliente
 import contador
 import middleware.middleware as middle
+from server.processamento.game_state import GameState
+from server.processamento.data_structure import Data_Structure
+from server.processamento.player import Player
 
 class Maquina:
     def __init__(self,server_address,port):
@@ -21,7 +24,11 @@ class Maquina:
         #self.s.setblocking(False)
         #self.s.listen(1)
         self.contador = contador.Contador()
+        self.game_state = GameState()
+        self.data_structure = Data_Structure()
+        self.player = Player()
         self._socket.settimeout(2.0)
+
 
     def exec(self):
         #print("Waiting for clients to connect on port " + str(self.port))
@@ -38,7 +45,7 @@ class Maquina:
                 first_connection = True
                 # Create and start a new ClientThread for each client connection
                 #tc = thread_cliente.ThreadCliente(connection, address, self.contador)
-                tc = thread_cliente.ThreadCliente(self._new_socket, self.contador)
+                tc = thread_cliente.ThreadCliente(self._new_socket, self.contador, self.game_state, self.data_structure, self.player)
                 tc.start()
 
             except socket.timeout:

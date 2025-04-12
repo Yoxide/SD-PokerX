@@ -59,6 +59,7 @@ class Data_Structure:
         for _ in range(n):
             player.add_to_hand(self._deck.pop())
         print(player.hand)
+        return player.hand
 
     def deal_community_cards(self):
         """ Método para "dar" as 5 cartas comunitárias"""

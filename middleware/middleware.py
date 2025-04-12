@@ -43,29 +43,25 @@ class Socket:
         data = self.connection.recv(n_bytes)
         return int.from_bytes(data, byteorder='big', signed=True)
 
-    def send_list(self, value: list) -> None:
+    def send_object(self, obj: any) -> None:
         """
-        :param value: The list of strings to be sent
+        :param obj: The list of strings to be sent
         :return: None
         """
-        # Serialize the list into a JSON string
-        list_str = json.dumps(value)
 
-        # Send the serialized list using send_str
-        self.send_str(list_str)
+        data = json.dumps(obj).encode()
+        length = len(data)
+        self.send_int(length, 4)
+        self.connection.send(data)
 
-    def receive_list(self, n_bytes: int) -> list:
+    def receive_object(self) -> int:
         """
         :param n_bytes: The number of bytes to read from the current connection
         :return: The deserialized list of strings
         """
-        # Receive the serialized list string using receive_str
-        list_str = self.receive_str(n_bytes)
-
-        # Deserialize the string back into a list using JSON
-        list_of_strings = json.loads(list_str)
-
-        return list_of_strings
+        length = self.receive_int(4)
+        data = self.connection.recv(length)
+        return json.loads(data.decode())
 
     def close(self):
         self.connection.close()

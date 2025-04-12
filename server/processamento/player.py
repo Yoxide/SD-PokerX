@@ -28,6 +28,9 @@ class Player:
     def add_to_hand(self, card:str):
         self.hand.append(card)
 
+    def set_hand(self, hand:list):
+        self.hand = hand
+
     def bet(self, valor_aposta: int) -> int:
         self.chips -= valor_aposta
         return valor_aposta

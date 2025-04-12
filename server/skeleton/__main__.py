@@ -1,6 +1,6 @@
 import maquina
 
-PORT = 35005
+PORT = 35000
 SERVER_ADDRESS = "localhost"
 
 def main():

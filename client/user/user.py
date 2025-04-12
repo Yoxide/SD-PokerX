@@ -34,6 +34,7 @@ class User:
                 # quero fazer a aposta sem que se saiba que ela não é feita no cliente!
                 res = self.processar.bet(b_value)
                 print(f"Apostaste {res} fichas!")
+                self.player.set_hand(self.processar.cards_received())
                 print(f"Aqui estão as tuas cartas: {self.player.hand}")
             case 2:
                 print("Desististe da rodada! Agora espera pela próxima!")

@@ -41,23 +41,12 @@ class ThreadCliente(threading.Thread):
         self._socket.send_str(string)
 
 
-    def send_list(self, string_list: list):
-
-        # Convert the list to a JSON string
-        list_str = json.dumps(string_list)
-
-        # Send the serialized string using the send_str method
-        self.send_str(list_str)
+    def send_obj(self, obj: any) -> None:
+        self._socket.send_object(obj)
 
 
-    def receive_list(self, n_bytes: int) -> list:
-        # Receive the string from the server
-        list_str = self.receive_str(n_bytes)
-
-        # Convert the string back into a list using JSON
-        string_list = json.loads(list_str)
-
-        return string_list
+    def receive_object(self) -> int:
+        return self._socket.receive_object()
 # ---------------------- interaction with sockets ------------------------------
 #     def receive_int(self,connection, n_bytes: int) -> int:
 #         """
@@ -120,8 +109,7 @@ class ThreadCliente(threading.Thread):
                 print("Enviámos o valor da aposta para o jogador")
                 self.data_structure.shuffle_deck()
                 cards_received = self.data_structure.deal_hand(self.player_number, 2)
-                self.send_list(cards_received)
-
+                self.send_obj(cards_received)
                 print(f"Relembramos que o número do jogador é {self.player_number}!")
                 #result = self.som.operacao(a,b)
                 #self.send_int(result,INT_SIZE)

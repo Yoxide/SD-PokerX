@@ -36,13 +36,13 @@ class Interface:
     def receive_int(self,n_bytes: int) -> int:
         return self._socket.receive_int(n_bytes)
 
-    def send_list(self, string_list: list):
+    def send_object(self, obj: any):
         # Convert the list to a JSON string
-        return self._socket.send_list(string_list)
+        return self._socket.send_object(obj)
 
-    def receive_list(self, n_bytes: int):
+    def receive_object(self):
         # Receive the string from the server
-        return self._socket.receive_list(n_bytes)
+        return self._socket.receive_object()
 
         # Convert the string back into a list using JSON
 
@@ -70,8 +70,11 @@ class Interface:
         self.send_str(HIT_OP)
         self.send_int(b_value, INT_SIZE)
         res = self.receive_int(INT_SIZE)
-        received_cards = self.receive_list(LIST_SIZE)
         return res
+
+    def cards_received(self):
+        received_cards = self.receive_object()
+        return received_cards
 
     def fold(self) -> int:
         self.send_str(FLD_OP)

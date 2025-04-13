@@ -1,5 +1,5 @@
 import threading
-from server.processamento import somar, subtracao, player
+from server.processamento import player
 import middleware.middleware as middle
 from server.processamento import game_state
 import json
@@ -23,8 +23,6 @@ class ThreadCliente(threading.Thread):
         self.address = self._socket.get_address()
         self.port = self._socket.get_port()
         #self.address = address
-        self.som = somar.Somar()
-        self.sub = subtracao.Subtracao()
 
 
 
@@ -110,7 +108,10 @@ class ThreadCliente(threading.Thread):
                 self.data_structure.shuffle_deck()
                 cards_received = self.data_structure.deal_hand(self.player_number, 2)
                 self.send_obj(cards_received)
-                self.send_obj(self.data_structure.deal_community_cards(3))
+                community_cards = self.data_structure.deal_community_cards(3)
+                self.send_obj(community_cards)
+                cards_received.extend(community_cards)
+                print(cards_received)
                 print(self.data_structure.evaluate_hand(cards_received))
                 #result = self.som.operacao(a,b)
                 #self.send_int(result,INT_SIZE)
@@ -119,8 +120,8 @@ class ThreadCliente(threading.Thread):
                 a = self.receive_int(INT_SIZE)
                 b = self.receive_int(INT_SIZE)
                 print("O jogador vai passar")
-                result = self.sub.operacao(a,b)
-                self.send_int(result,INT_SIZE)
+                #result = self.sub.operacao(a,b)
+                #self.send_int(result,INT_SIZE)
                 #self.send_int(self.connection,result, INT_SIZE)
             elif request_type == FLD_OP:
                 print("O jogador desistiu da rodada!")

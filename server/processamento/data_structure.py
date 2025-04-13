@@ -68,7 +68,7 @@ class Data_Structure:
     def deal_community_cards(self, n: int):
         """ Método para "dar" as 5 cartas comunitárias"""
         chosen_cards = [self._deck.pop() for _ in range(n)]
-        self._community_cards.append(chosen_cards) # n cartas comunitárias
+        self._community_cards.extend(chosen_cards) # n cartas comunitárias
         return self._community_cards
 
     def player_choice(self, pl:int, choice: int):

@@ -110,7 +110,8 @@ class ThreadCliente(threading.Thread):
                 self.data_structure.shuffle_deck()
                 cards_received = self.data_structure.deal_hand(self.player_number, 2)
                 self.send_obj(cards_received)
-                print(f"Relembramos que o número do jogador é {self.player_number}!")
+                self.send_obj(self.data_structure.deal_community_cards(3))
+                print(self.data_structure.evaluate_hand(cards_received))
                 #result = self.som.operacao(a,b)
                 #self.send_int(result,INT_SIZE)
 

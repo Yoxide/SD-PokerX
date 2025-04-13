@@ -35,7 +35,9 @@ class User:
                 res = self.processar.bet(b_value)
                 print(f"Apostaste {res} fichas!")
                 self.player.set_hand(self.processar.cards_received())
-                print(f"Aqui estão as tuas cartas: {self.player.hand}")
+                com_cards = self.processar.community_cards()
+                print(f"Aqui estão as tuas cartas: {self.player.hand}\n"
+                      f"Cartas comunitárias: {com_cards}")
             case 2:
                 print("Desististe da rodada! Agora espera pela próxima!")
                 self.processar.fold()

@@ -37,7 +37,7 @@ class Interface:
         return self._socket.receive_int(n_bytes)
 
     def send_object(self, obj: any):
-        # Convert the list to a JSON string
+        # Convert the list to a JSON object
         return self._socket.send_object(obj)
 
     def receive_object(self):
@@ -73,8 +73,10 @@ class Interface:
         return res
 
     def cards_received(self):
-        received_cards = self.receive_object()
-        return received_cards
+        return self.receive_object()
+
+    def community_cards(self):
+        return self.receive_object()
 
     def fold(self) -> int:
         self.send_str(FLD_OP)

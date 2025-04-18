@@ -1,9 +1,8 @@
-#import socket
 import middleware.middleware as middle
-import client
-import json
+
 
 from client.stub import COMMAND_SIZE, INT_SIZE, HIT_OP, PAS_OP, FLD_OP, BYE_OP, LIST_SIZE
+from server.skeleton import DIST_OP
 
 
 class Interface:
@@ -77,6 +76,13 @@ class Interface:
 
     def community_cards(self):
         return self.receive_object()
+
+    def more_community_cards(self):
+        self.send_str(HIT_OP)
+
+    def pass_turn(self):
+        self.send_str(DIST_OP)
+
 
     def fold(self) -> int:
         self.send_str(FLD_OP)

@@ -45,14 +45,14 @@ class Data_Structure:
         """Retorna o estado do jogo"""
         return self._game
 
-    def add_name(self, name:str):
-        if len(self._players) == 0:
-            self._p1 = name
-            self._players.append(name)
-        else:
-            self._p2 = name
-            self._players.append(name)
+    def add_name(self, name):
+        pass
 
+
+    def add_player(self, player_id):
+        """Adiciona um jogador"""
+        if player_id not in self._players:
+            self._players[player_id] = Player()
 
     def shuffle_deck(self):
         """ Método para baralhar as cartas"""

@@ -26,7 +26,6 @@ class Maquina:
         self.contador = contador.Contador()
         self.game_state = GameState()
         self.data_structure = Data_Structure()
-        self.player = Player()
         self._socket.settimeout(2.0)
 
 
@@ -45,7 +44,7 @@ class Maquina:
                 first_connection = True
                 # Create and start a new ClientThread for each client connection
                 #tc = thread_cliente.ThreadCliente(connection, address, self.contador)
-                tc = thread_cliente.ThreadCliente(self._new_socket, self.contador, self.game_state, self.data_structure, self.player)
+                tc = thread_cliente.ThreadCliente(self._new_socket, self.contador, self.game_state, self.data_structure, Player())
                 tc.start()
 
             except socket.timeout:

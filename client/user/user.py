@@ -28,9 +28,9 @@ class User:
         num = self.processar.receive_int(INT_SIZE)
         print(f"O teu número de jogador: {num}")
         while True:
-            print("Espera pela a tua vez!\n")
-            ok = self.processar.receive_str(2)
-            if ok != "OK":
+            print("Espera pela tua vez!\n")
+            ok = self.processar.receive_str(9)
+            if ok != "okay     ":
                 continue
             print("É a tua vez!\n")
             option = int(input("Escolhe a opção que pretendes fazer\n1-Apostar\n2-Desistir\n3-Passar\n"))

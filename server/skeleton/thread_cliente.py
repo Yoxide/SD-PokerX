@@ -42,7 +42,6 @@ class ThreadCliente(threading.Thread):
     def run(self):
         last_request = False
 
-        # CONEXAO  Recebem o nome do jogador e retornam o número
         self.gamestate.current_players.append(self.player)
         self.player_number = self.gamestate.current_players.index(self.player)
         self.send_int(self.player_number, INT_SIZE)

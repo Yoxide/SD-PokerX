@@ -22,9 +22,13 @@ class GameState:
         with self.turn_lock:
             self.actions_this_round += 1
             self.current_player = (self.current_player + 1) % len(self.current_players)
+
+            everyone_played = False
             if self.actions_this_round >= self.total_players:
                 self.actions_this_round = 0
-                return True  # Já todos jogaram
+                everyone_played = True
+
             self.turn_lock.notify_all()
-            return False  # Ainda não jogaram todos
+            return everyone_played
+
 

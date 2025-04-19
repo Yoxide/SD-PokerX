@@ -24,8 +24,20 @@ PASS = 2
 
 RANK_ORDER = {'2': 2, '3': 3, '4': 4, '5': 5, '6': 6, '7': 7,
               '8': 8, '9': 9, 'T': 10, 'J': 11, 'Q': 12, 'K': 13, 'A': 14}
+HAND_RANKING = {
+    "Royal Flush": 10,
+    "Straight Flush": 9,
+    "Four of a Kind": 8,
+    "Full House": 7,
+    "Flush": 6,
+    "Straight": 5,
+    "Three of a Kind": 4,
+    "Two Pair": 3,
+    "One Pair": 2,
+    "Sem par": 1
+}
 
-class Data_Structure:
+class DataStructure:
     def __init__(self):
         """ Classe com as estruturas de dados básicas do jogo"""
         self._ranks = "23456789TJQKA"
@@ -35,8 +47,6 @@ class Data_Structure:
         self._community_cards = []
         self._min_bet = 0
         self._game = {}
-        #self._p1 = ""
-        #self._p2 = ""
         self._players["0"] = Player()
         self._players["1"] = Player()
 
@@ -83,25 +93,25 @@ class Data_Structure:
 
     def evaluate_hand(self, hand):
         if self.is_royal_flush(hand):
-            return "Royal Flush"
+            return HAND_RANKING["Royal Flush"], self.get_sorted_rank_values(hand)
         elif self.is_straight_flush(hand):
-            return "Straight Flush"
+            return HAND_RANKING["Straight Flush"], self.get_sorted_rank_values(hand)
         elif self.is_four_of_a_kind(hand):
-            return "Four of a Kind"
+            return HAND_RANKING["Four of a Kind"], self.get_sorted_rank_values(hand)
         elif self.is_full_house(hand):
-            return "Full House"
+            return HAND_RANKING["Full House"], self.get_sorted_rank_values(hand)
         elif self.is_flush(hand):
-            return "Flush"
+            return HAND_RANKING["Flush"], self.get_sorted_rank_values(hand)
         elif self.is_straight(hand):
-            return "Straight"
+            return HAND_RANKING["Straight"], self.get_sorted_rank_values(hand)
         elif self.is_three_of_a_kind(hand):
-            return "Three of a Kind"
+            return HAND_RANKING["Three of a Kind"], self.get_sorted_rank_values(hand)
         elif self.is_two_pair(hand):
-            return "Two Pair"
+            return HAND_RANKING["Two Pair"], self.get_sorted_rank_values(hand)
         elif self.is_one_pair(hand):
-            return "One Pair"
+            return HAND_RANKING["One Pair"], self.get_sorted_rank_values(hand)
         else:
-            return "Sem par"
+            return HAND_RANKING["Sem par"], self.get_sorted_rank_values(hand)
 
     def get_ranks(self, hand):
         return [card.split('-')[0] for card in hand]
@@ -162,4 +172,22 @@ class Data_Structure:
             self.is_straight_flush(hand),
             self.is_royal_flush(hand)
         ])
+
+    def compare_hands(self, hand1, hand2):
+        rank1, kicker1 = self.evaluate_hand(hand1)
+        rank2, kicker2 = self.evaluate_hand(hand2)
+
+        if rank1 > rank2:
+            return 1  # hand1 ganha
+        elif rank2 > rank1:
+            return -1  # hand2 ganha
+        else:
+            # Compare kicker values
+            for k1, k2 in zip(kicker1, kicker2):
+                if k1 > k2:
+                    return 1
+                elif k2 > k1:
+                    return -1
+            return 0  # Tie
+
 

@@ -3,7 +3,7 @@ import thread_cliente
 import contador
 import middleware.middleware as middle
 from server.processamento.game_state import GameState
-from server.processamento.data_structure import Data_Structure
+from server.processamento.data_structure import DataStructure
 from server.processamento.player import Player
 
 class Maquina:
@@ -25,7 +25,7 @@ class Maquina:
         #self.s.listen(1)
         self.contador = contador.Contador()
         self.game_state = GameState()
-        self.data_structure = Data_Structure()
+        self.data_structure = DataStructure()
         self._socket.settimeout(2.0)
 
 

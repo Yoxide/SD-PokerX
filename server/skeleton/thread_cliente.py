@@ -2,13 +2,13 @@ import threading
 import middleware.middleware as middle
 from server.processamento import game_state
 from server.skeleton import COMMAND_SIZE, DIST_OP, INT_SIZE, HIT_OP, PAS_OP, FLD_OP, BYE_OP, OK_OP
-from server.processamento.data_structure import Data_Structure
+from server.processamento.data_structure import DataStructure
 from server.processamento.player import Player
 from time import sleep
 
 class ThreadCliente(threading.Thread):
 
-    def __init__(self,socket: middle.Socket, contador, gamestate: game_state.GameState, data_structure: Data_Structure, player: Player):
+    def __init__(self, socket: middle.Socket, contador, gamestate: game_state.GameState, data_structure: DataStructure, player: Player):
 
         threading.Thread.__init__(self)
         self._socket = socket
@@ -75,17 +75,17 @@ class ThreadCliente(threading.Thread):
                 cards_received.extend(community_cards)
                 print(cards_received)
                 print(self.data_structure.evaluate_hand(cards_received))
-                self.gamestate.increment_state()
+                self.gamestate.increment_state(self.data_structure)
                 print("Relembramos que o número do jogador é", self.player_number)
 
 
             elif request_type == PAS_OP:
                 print("O jogador vai passar")
-                self.gamestate.increment_state()
+                self.gamestate.increment_state(self.data_structure)
 
             elif request_type == FLD_OP:
                 print("O jogador desistiu da rodada!")
-                self.gamestate.increment_state()
+                self.gamestate.increment_state(self.data_structure)
 
             elif request_type == BYE_OP:
                 print("Client ",self.address," disconnected!")

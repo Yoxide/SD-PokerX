@@ -81,7 +81,7 @@ class Interface:
         self.send_str(HIT_OP)
 
     def pass_turn(self):
-        self.send_str(DIST_OP)
+        self.send_str(PAS_OP)
 
 
     def fold(self) -> int:

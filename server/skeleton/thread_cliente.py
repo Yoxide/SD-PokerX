@@ -43,28 +43,22 @@ class ThreadCliente(threading.Thread):
         last_request = False
         # Recebe messagens...
         while not last_request:
-
             # CONEXAO  Recebem o nome do jogador e retornam o número
-            self.gamestate._current_players.append(self.player)
-            self.player_number = self.gamestate._current_players.index(self.player)
+            self.gamestate.current_players.append(self.player)
+            self.player_number = self.gamestate.current_players.index(self.player)
             self.send_int(self.player_number, INT_SIZE)
+
+            with self.gamestate.turn_lock:
+                while self.player_number != self.gamestate.actual_player():
+                    self.gamestate.turn_lock.wait()
+
+            # Turno do cliente
+            self.send_str(OK_OP)
+
+            # Ação do jogador
             request_type = self.receive_str(COMMAND_SIZE)
-            if request_type == DIST_OP:
-                self.gamestate.increment_state()
-                # Pedir cartas ao data_structure com indicacão do nr_jogador
-                self.send_obj(self.data_structure.deal_community_cards(1))
 
-                with self.gamestate.turn_lock:
-                    while self.player_number != self.gamestate.actual_player():
-                        self.gamestate.turn_lock.wait()
-                print(f"[Player {self.player_number}] It's my turn!")
-
-                self.send_str(OK_OP)
-                # waiting for player turn
-                sleep(1)
-                print("Envio a distribuição")
-
-            elif request_type == HIT_OP:
+            if request_type == HIT_OP:
                 print("O jogador vai a jogo")
                 b_value = self.receive_int(INT_SIZE)
                 aposta = self.player.bet(b_value)
@@ -83,18 +77,16 @@ class ThreadCliente(threading.Thread):
                 print(self.data_structure.evaluate_hand(cards_received))
                 self.gamestate.increment_state()
                 print("Relembramos que o número do jogador é", self.player_number)
-                #result = self.som.operacao(a,b)
-                #self.send_int(result,INT_SIZE)
+
 
             elif request_type == PAS_OP:
-                a = self.receive_int(INT_SIZE)
-                b = self.receive_int(INT_SIZE)
                 print("O jogador vai passar")
-                #result = self.sub.operacao(a,b)
-                #self.send_int(result,INT_SIZE)
-                #self.send_int(self.connection,result, INT_SIZE)
+                self.gamestate.increment_state()
+
             elif request_type == FLD_OP:
                 print("O jogador desistiu da rodada!")
+                self.gamestate.increment_state()
+
             elif request_type == BYE_OP:
                 print("Client ",self.address," disconnected!")
                 self.contador.decrementa()

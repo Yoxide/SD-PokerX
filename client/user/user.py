@@ -32,7 +32,10 @@ class User:
             ok = self.processar.receive_str(9)
             if ok != "okay     ":
                 continue
-            print("É a tua vez!\n")
+            com_cards = self.processar.receive_object()
+            print(f"Cartas comunitárias: {com_cards}")
+
+            print("É a tua vez!")
             option = int(input("Escolhe a opção que pretendes fazer\n1-Apostar\n2-Desistir\n3-Passar\n"))
             match option:
                 case 1:
@@ -42,9 +45,9 @@ class User:
                     res = self.processar.bet(b_value)
                     print(f"Apostaste {res} fichas!")
                     self.player.set_hand(self.processar.cards_received())
-                    com_cards = self.processar.community_cards()
-                    print(f"Aqui estão as tuas cartas: {self.player.hand}\n"
-                              f"Cartas comunitárias: {com_cards}")
+
+                    print(f"Aqui estão as tuas cartas: {self.player.hand}\n")
+
 
                 case 2:
                     self.processar.fold()

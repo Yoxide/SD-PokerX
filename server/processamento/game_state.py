@@ -28,7 +28,7 @@ class GameState:
                 self.actions_this_round = 0
                 everyone_played = True
 
-                if self.community_dealt < 5:
+                if self.community_dealt <= 5:
                     # Flop
                     if self.community_dealt == 0:
                         cards = data_structure.deal_community_cards(3)

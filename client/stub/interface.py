@@ -74,9 +74,6 @@ class Interface:
     def cards_received(self):
         return self.receive_object()
 
-    def community_cards(self):
-        return self.receive_object()
-
     def more_community_cards(self):
         self.send_str(HIT_OP)
 

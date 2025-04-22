@@ -123,44 +123,44 @@ class DataStructure:
         ranks = self.get_ranks(hand)
         return Counter(ranks)
 
-    def get_sorted_rank_values(self, hand):
+    def get_sorted_rank_values(self, hand) -> list:
         return sorted([RANK_ORDER[rank] for rank in self.get_ranks(hand)], reverse=True)
 
-    def is_royal_flush(self, hand):
+    def is_royal_flush(self, hand) -> bool:
         return self.is_straight_flush(hand) and set(self.get_ranks(hand)) == {'A', 'K', 'Q', 'J', 'T'}
 
-    def is_straight_flush(self, hand):
+    def is_straight_flush(self, hand) -> bool:
         return self.is_flush(hand) and self.is_straight(hand)
 
-    def is_four_of_a_kind(self, hand):
+    def is_four_of_a_kind(self, hand) -> bool:
         return 4 in self.get_rank_counts(hand).values()
 
-    def is_full_house(self, hand):
+    def is_full_house(self, hand) -> bool:
         counts = self.get_rank_counts(hand).values()
         return 3 in counts and 2 in counts
 
-    def is_flush(self, hand):
+    def is_flush(self, hand) -> bool:
         suits = self.get_suits(hand)
         return len(set(suits)) == 1
 
-    def is_straight(self, hand):
+    def is_straight(self, hand) -> bool:
         values = self.get_sorted_rank_values(hand)
         if values == [14, 5, 4, 3, 2]:  # Handle wheel straight (A-2-3-4-5)
             return True
         return all(values[i] - 1 == values[i + 1] for i in range(len(values) - 1))
 
-    def is_three_of_a_kind(self, hand):
+    def is_three_of_a_kind(self, hand) -> bool:
         return 3 in self.get_rank_counts(hand).values() and not self.is_full_house(hand)
 
-    def is_two_pair(self, hand):
+    def is_two_pair(self, hand) -> bool:
         counts = self.get_rank_counts(hand).values()
         return list(counts).count(2) == 2
 
-    def is_one_pair(self, hand):
+    def is_one_pair(self, hand) -> bool:
         counts = self.get_rank_counts(hand).values()
         return list(counts).count(2) == 1
 
-    def is_high_card(self, hand):
+    def is_high_card(self, hand) -> bool:
         return not any([
             self.is_one_pair(hand),
             self.is_two_pair(hand),
@@ -177,17 +177,18 @@ class DataStructure:
         rank1, kicker1 = self.evaluate_hand(hand1)
         rank2, kicker2 = self.evaluate_hand(hand2)
 
+        # Comparar os pares
         if rank1 > rank2:
             return 1  # hand1 ganha
         elif rank2 > rank1:
             return -1  # hand2 ganha
         else:
-            # Compare kicker values
+            # Comparar os kickers
             for k1, k2 in zip(kicker1, kicker2):
                 if k1 > k2:
-                    return 1
+                    return 1 # hand1 ganha
                 elif k2 > k1:
-                    return -1
-            return 0  # Tie
+                    return -1 # hand2 ganha
+            return 0  # Empate
 
 

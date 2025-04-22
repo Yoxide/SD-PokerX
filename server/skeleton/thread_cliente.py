@@ -35,9 +35,30 @@ class ThreadCliente(threading.Thread):
     def send_obj(self, obj: any) -> None:
         self._socket.send_object(obj)
 
-
     def receive_object(self) -> int:
         return self._socket.receive_object()
+
+    def evaluate_and_announce_winner(self):
+        best_player = None
+        best_hand = None
+        best_eval = None
+        print("\n--- Avaliação Final das Mãos ---")
+
+        for pid, player in self.data_structure._players.items():
+            full_hand = player.hand + self.data_structure._community_cards
+            print(f"Jogador {pid}: Mão completa -> {full_hand}")
+            if best_hand is None:
+                best_hand = full_hand
+                best_player = pid
+                best_eval = self.data_structure.evaluate_hand(full_hand)
+            else:
+                if self.data_structure.compare_hands(full_hand, best_hand) == 1:
+                    best_hand = full_hand
+                    best_player = pid
+                    best_eval = self.data_structure.evaluate_hand(full_hand)
+
+        print(f"\n🎉 Jogador vencedor: {best_player} com a mão: {best_eval}")
+        self.data_structure.shuffle_deck()
 
     def run(self):
         last_request = False
@@ -45,7 +66,7 @@ class ThreadCliente(threading.Thread):
         self.gamestate.current_players.append(self.player)
         self.player_number = self.gamestate.current_players.index(self.player)
         self.send_int(self.player_number, INT_SIZE)
-
+        self.data_structure.shuffle_deck()
         # Recebe messagens...
         while not last_request:
             with self.gamestate.turn_lock:
@@ -54,6 +75,7 @@ class ThreadCliente(threading.Thread):
 
             # Turno do cliente
             self.send_str(OK_OP)
+            self.send_obj(self.data_structure._community_cards)
 
             # Ação do jogador
             request_type = self.receive_str(COMMAND_SIZE)
@@ -65,27 +87,32 @@ class ThreadCliente(threading.Thread):
                 print(f"O jogador apostou {aposta} fichas")
                 self.send_int(aposta, INT_SIZE)
                 print("Enviámos o valor da aposta para o jogador")
-                self.data_structure.shuffle_deck()
-                # O servidor envia 2 cartas ao jogador
-                cards_received = self.data_structure.deal_hand(self.player_number, 2)
-                self.send_obj(cards_received)
-                # O servidor revela 3 cartas comunitárias
-                community_cards = self.data_structure.deal_community_cards(3)
-                self.send_obj(community_cards)
-                cards_received.extend(community_cards)
-                print(cards_received)
-                print(self.data_structure.evaluate_hand(cards_received))
-                self.gamestate.increment_state(self.data_structure)
-                print("Relembramos que o número do jogador é", self.player_number)
 
+                player_id = str(self.player_number)
+                player = self.data_structure._players[player_id]
+                # Na primeira ronda quando o jogador ainda não tem cartas
+                if not player.hand:
+                    # O servidor envia 2 cartas ao jogador
+                    self.data_structure.deal_hand(self.player_number, 2)
+                self.send_obj(player.hand)
+
+                print(player.hand)
+                print(self.data_structure.evaluate_hand(player.hand))
+                everyone_played = self.gamestate.increment_state(self.data_structure)
+                if everyone_played and self.gamestate.community_dealt == 5:
+                    self.evaluate_and_announce_winner()
 
             elif request_type == PAS_OP:
                 print("O jogador vai passar")
-                self.gamestate.increment_state(self.data_structure)
+                everyone_played = self.gamestate.increment_state(self.data_structure)
+                if everyone_played and self.gamestate.community_dealt == 5:
+                    self.evaluate_and_announce_winner()
 
             elif request_type == FLD_OP:
                 print("O jogador desistiu da rodada!")
-                self.gamestate.increment_state(self.data_structure)
+                everyone_played = self.gamestate.increment_state(self.data_structure)
+                if everyone_played and self.gamestate.community_dealt == 5:
+                    self.evaluate_and_announce_winner()
 
             elif request_type == BYE_OP:
                 print("Client ",self.address," disconnected!")

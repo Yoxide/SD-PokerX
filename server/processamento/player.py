@@ -34,3 +34,6 @@ class Player:
     def bet(self, valor_aposta: int) -> int:
         self.chips -= valor_aposta
         return valor_aposta
+
+    def clear_hand(self):
+        self.hand = []

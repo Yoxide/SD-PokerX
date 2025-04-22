@@ -42,22 +42,36 @@ class ThreadCliente(threading.Thread):
         best_player = None
         best_hand = None
         best_eval = None
+        best_eval_name = None
+
         print("\n--- Avaliação Final das Mãos ---")
 
         for pid, player in self.data_structure._players.items():
             full_hand = player.hand + self.data_structure._community_cards
             print(f"Jogador {pid}: Mão completa -> {full_hand}")
+            rank_value, kickers = self.data_structure.evaluate_hand(full_hand)
+
             if best_hand is None:
                 best_hand = full_hand
                 best_player = pid
-                best_eval = self.data_structure.evaluate_hand(full_hand)
+                best_eval = (rank_value, kickers)
+                best_eval_name = self.data_structure.get_hand_name(rank_value)
             else:
                 if self.data_structure.compare_hands(full_hand, best_hand) == 1:
                     best_hand = full_hand
                     best_player = pid
-                    best_eval = self.data_structure.evaluate_hand(full_hand)
+                    best_eval = (rank_value, kickers)
+                    best_eval_name = self.data_structure.get_hand_name(rank_value)
 
-        print(f"\n🎉 Jogador vencedor: {best_player} com a mão: {best_eval}")
+        print(f"\n🎉 Jogador vencedor: {best_player} com {best_eval_name} (Ranking: {best_eval})")
+        result_str = f"Jogador {best_player} venceu com {best_eval_name}!"
+        self.send_str(result_str)
+        self.data_structure._community_cards.clear()
+        self.gamestate.community_dealt = 0
+        self.gamestate.actions_this_round = 0  #
+        for player in self.data_structure._players.values():
+            player.clear_hand()
+
         self.data_structure.shuffle_deck()
 
     def run(self):
@@ -90,6 +104,7 @@ class ThreadCliente(threading.Thread):
 
                 player_id = str(self.player_number)
                 player = self.data_structure._players[player_id]
+
                 # Na primeira ronda quando o jogador ainda não tem cartas
                 if not player.hand:
                     # O servidor envia 2 cartas ao jogador
@@ -98,9 +113,15 @@ class ThreadCliente(threading.Thread):
 
                 print(player.hand)
                 print(self.data_structure.evaluate_hand(player.hand))
-                everyone_played = self.gamestate.increment_state(self.data_structure)
-                if everyone_played and self.gamestate.community_dealt == 5:
+
+                new_cards = self.gamestate.increment_state(self.data_structure)
+
+                if new_cards:
+                    print(f"Novas cartas comunitárias: {new_cards}")
+
+                if self.gamestate.community_dealt == 5 and self.gamestate.actions_this_round == 0:
                     self.evaluate_and_announce_winner()
+
 
             elif request_type == PAS_OP:
                 print("O jogador vai passar")

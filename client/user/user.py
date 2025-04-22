@@ -49,6 +49,7 @@ class User:
                     print(f"Aqui estão as tuas cartas: {self.player.hand}\n")
 
 
+
                 case 2:
                     self.processar.fold()
                     print("Desististe da rodada! Agora espera pela próxima!")

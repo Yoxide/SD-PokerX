@@ -79,7 +79,7 @@ class DataStructure:
         """ Método para "dar" as 5 cartas comunitárias"""
         chosen_cards = [self._deck.pop() for _ in range(n)]
         self._community_cards.extend(chosen_cards) # n cartas comunitárias
-        return self._community_cards
+        return chosen_cards
 
     def player_choice(self, pl:int, choice: int):
         """ Método para verificar a ação do jogador"""
@@ -190,5 +190,12 @@ class DataStructure:
                 elif k2 > k1:
                     return -1 # hand2 ganha
             return 0  # Empate
+
+    def get_hand_name(self, rank_value):
+        for name, value in HAND_RANKING.items():
+            if value == rank_value:
+                return name
+        return "Mão desconhecida"
+
 
 

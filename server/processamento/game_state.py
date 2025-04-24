@@ -25,12 +25,12 @@ class GameState:
 
             new_cards = []
 
-            if self.actions_this_round >= self.total_players:
+            if self.actions_this_round >= len(self.current_players):
                 self.actions_this_round = 0
 
                 if self.community_dealt == 0:
                     new_cards = data_structure.deal_community_cards(3)
-                elif self.community_dealt < 5:
+                elif self.community_dealt <= 5:
                     new_cards = data_structure.deal_community_cards(1)
 
                 self.community_dealt += len(new_cards)

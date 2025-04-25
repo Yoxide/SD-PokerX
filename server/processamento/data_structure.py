@@ -197,5 +197,11 @@ class DataStructure:
                 return name
         return "Mão desconhecida"
 
+    def get_active_players_ids(self) -> list:
+        return [
+            pid for pid, p in self._players.items()
+            if not p.is_folded()
+        ]
+
 
 

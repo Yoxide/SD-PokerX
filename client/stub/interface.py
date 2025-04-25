@@ -80,11 +80,8 @@ class Interface:
     def pass_turn(self):
         self.send_str(PAS_OP)
 
-
     def fold(self) -> int:
         self.send_str(FLD_OP)
-        #self.send_int(a, INT_SIZE)
-        #res = self.receive_int(INT_SIZE)
         return 0
 
     # def exec(self):

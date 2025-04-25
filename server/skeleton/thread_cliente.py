@@ -47,6 +47,10 @@ class ThreadCliente(threading.Thread):
         print("\n--- Avaliação Final das Mãos ---")
 
         for pid, player in self.data_structure._players.items():
+
+            if player.is_folded():
+                continue
+
             full_hand = player.hand + self.data_structure._community_cards
             print(f"Jogador {pid}: Mão completa -> {full_hand}")
             rank_value, kickers = self.data_structure.evaluate_hand(full_hand)
@@ -56,7 +60,9 @@ class ThreadCliente(threading.Thread):
                 best_player = pid
                 best_eval = (rank_value, kickers)
                 best_eval_name = self.data_structure.get_hand_name(rank_value)
+
             else:
+
                 if self.data_structure.compare_hands(full_hand, best_hand) == 1:
                     best_hand = full_hand
                     best_player = pid
@@ -68,11 +74,27 @@ class ThreadCliente(threading.Thread):
         self.send_str(result_str)
         self.data_structure._community_cards.clear()
         self.gamestate.community_dealt = 0
-        self.gamestate.actions_this_round = 0  #
+        self.gamestate.actions_this_round = 0
+
         for player in self.data_structure._players.values():
             player.clear_hand()
 
         self.data_structure.shuffle_deck()
+
+    def check_auto_win(self):
+        active = self.data_structure.get_active_players_ids()
+
+        print(f"Jogadores ativos: {active}")
+
+        if len(active) == 1:
+            winner = active[0]
+            result_str = f"Jogador {winner} venceu por desistência dos outros jogadores!"
+            print(f"[AUTO-WIN] {result_str}")
+            self.send_str("RESULT")
+            self.send_str(result_str)
+            return True  # O jogo acaba
+
+        return False  # continuar
 
     def run(self):
         last_request = False
@@ -83,8 +105,9 @@ class ThreadCliente(threading.Thread):
         self.data_structure.shuffle_deck()
         # Recebe messagens...
         while not last_request:
-            with self.gamestate.turn_lock:
-                while self.player_number != self.gamestate.actual_player():
+            with (self.gamestate.turn_lock):
+                while (self.player_number != self.gamestate.actual_player()
+                or self.data_structure._players[str(self.player_number)].is_folded()):
                     self.gamestate.turn_lock.wait()
 
             # Turno do cliente
@@ -116,24 +139,44 @@ class ThreadCliente(threading.Thread):
 
                 new_cards = self.gamestate.increment_state(self.data_structure)
 
+                if self.check_auto_win():
+                    return
+
                 if new_cards:
                     print(f"Novas cartas comunitárias: {new_cards}")
 
                 if self.gamestate.community_dealt == 5 and self.gamestate.actions_this_round == 0:
                     self.evaluate_and_announce_winner()
 
-
             elif request_type == PAS_OP:
-                print("O jogador vai passar")
-                everyone_played = self.gamestate.increment_state(self.data_structure)
-                if everyone_played and self.gamestate.community_dealt == 5:
+                print(f"O Jogador {self.player_number} passou.")
+                new_cards = self.gamestate.increment_state(self.data_structure)
+
+                if self.check_auto_win():
+                    return
+
+                if new_cards:
+                    print(f"Novas cartas comunitárias: {new_cards}")
+
+                if self.gamestate.community_dealt == 5 and self.gamestate.actions_this_round == 0:
                     self.evaluate_and_announce_winner()
 
             elif request_type == FLD_OP:
-                print("O jogador desistiu da rodada!")
-                everyone_played = self.gamestate.increment_state(self.data_structure)
-                if everyone_played and self.gamestate.community_dealt == 5:
+                print(f"Jogador {self.player_number} desistiu da rodada.")
+                player = self.data_structure._players[str(self.player_number)]
+                player.fold()
+                self.gamestate.total_players -= 1
+                new_cards = self.gamestate.increment_state(self.data_structure)
+
+                if self.check_auto_win():
+                    return
+
+                if new_cards:
+                    print(f"Novas cartas comunitárias: {new_cards}")
+
+                if self.gamestate.community_dealt == 5 and self.gamestate.actions_this_round == 0:
                     self.evaluate_and_announce_winner()
+
 
             elif request_type == BYE_OP:
                 print("Client ",self.address," disconnected!")

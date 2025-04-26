@@ -12,51 +12,54 @@ class User:
         valor_aposta = int(input("Introduz o valor da aposta: "))
         return valor_aposta
 
-
-    """
-    def valores_soma(self)->tuple:
-        res1 = int(input("Introduz o primeiro valor para somar:"))
-        res2 = int(input("Introduz o segundo valor para somar:"))
-        return (res1, res2)
-
-    def valores_subtracao(self)->tuple:
-        res1 = int(input("Introduz o primeiro valor para subtrair:"))
-        res2 = int(input("Introduz o segundo valor para subtrair:"))
-        return (res1, res2)
-"""
     def exec(self):
         num = self.processar.receive_int(INT_SIZE)
         print(f"O teu número de jogador: {num}")
         while True:
             print("Espera pela tua vez!\n")
-            ok = self.processar.receive_str(9)
-            if ok != "okay     ":
-                continue
-            com_cards = self.processar.receive_object()
-            print(f"Cartas comunitárias: {com_cards}")
+            msg = self.processar.receive_str(9)
+            if msg == "result   ":
+                result = self.processar.receive_str(100)  # The winner
+                print(result)
+                return  # End this client's loop (stop asking for moves)
 
-            print("É a tua vez!")
-            option = int(input("Escolhe a opção que pretendes fazer\n1-Apostar\n2-Desistir\n3-Passar\n"))
-            match option:
-                case 1:
-                    print("Vamos apostar? Anda daí!")
-                    b_value = self.bet_value()
-                    # quero fazer a aposta sem que se saiba que ela não é feita no cliente!
-                    res = self.processar.bet(b_value)
-                    print(f"Apostaste {res} fichas!")
-                    self.player.set_hand(self.processar.cards_received())
+            elif msg == "okay     ":
+                com_cards = self.processar.receive_object()
+                print(f"Cartas comunitárias: {com_cards}")
 
-                    print(f"Aqui estão as tuas cartas: {self.player.hand}\n")
+                print("É a tua vez!")
+                option = int(input("Escolhe a opção que pretendes fazer\n1-Apostar\n2-Desistir\n3-Passar\n"))
+                match option:
+                    case 1:
+                        print("Vamos apostar? Anda daí!")
+                        b_value = self.bet_value()
+                        # quero fazer a aposta sem que se saiba que ela não é feita no cliente!
+                        res = self.processar.bet(b_value)
+                        print(f"Apostaste {res} fichas!")
+                        msg = self.processar.receive_str(9)
 
-                case 2:
-                    self.processar.fold()
-                    print("Desististe da rodada! Agora espera pela próxima!")
+                        if msg == "hand     ":
+                            self.player.set_hand(self.processar.cards_received())
+                            print(f"Aqui estão as tuas cartas: {self.player.hand}\n")
 
-                case 3:
-                    self.processar.pass_turn()
-                    print("Passaste a tua vez.")
+                        elif msg == "result   ":
+                            result = self.processar.receive_str(100)
+                            print(result)
+                            return
 
-                case _:
-                    print("Escolha inválida!")
+                        else:
+                            print(f"[DEBUG] Mensagem inesperada depois de apostar: {msg}")
+
+                    case 2:
+                        print("Desististe da rodada! Agora espera pela próxima!")
+                        self.processar.fold()
+
+
+                    case 3:
+                        print("Passaste a tua vez.")
+                        self.processar.pass_turn()
+
+                    case _:
+                        print("Escolha inválida!")
 
 

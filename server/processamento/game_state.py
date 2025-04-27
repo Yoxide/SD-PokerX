@@ -16,7 +16,7 @@ class GameState:
             self.total_players = len(self.current_players)
 
     def actual_player(self):
-        return self.current_player
+        return self.current_player % len(self.current_players)
 
     def increment_state(self, data_structure):
         with self.turn_lock:
@@ -37,6 +37,16 @@ class GameState:
 
             self.turn_lock.notify_all()
             return new_cards
+
+    def increment_state_fold(self):
+        with self.turn_lock:
+            self.actions_this_round += 1
+            self.current_player = (self.current_player + 1) % len(self.current_players)
+
+            if self.actions_this_round >= len(self.current_players):
+                self.actions_this_round = 0
+
+            self.turn_lock.notify_all()
 
 
 

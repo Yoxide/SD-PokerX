@@ -88,7 +88,7 @@ class ThreadCliente(threading.Thread):
             winner = active[0]
             result_str = f"Jogador {winner} venceu por desistência dos outros jogadores!"
             print(f"[AUTO-WIN] {result_str}")
-            self.broadcast_result(result_str)
+            #self.broadcast_result(result_str)
             self.reset_round()
             return True  # O jogo acaba
 
@@ -104,17 +104,14 @@ class ThreadCliente(threading.Thread):
         for player in self.data_structure._players.values():
             player.clear_hand()
 
-        # Turno volta para o primeiro jogador
-        self.gamestate.current_player = 0
-
         # Acorda todas as threads
         with self.gamestate.turn_lock:
             self.gamestate.turn_lock.notify_all()
 
+
     def broadcast_result(self, result_str):
         for t in active_threads:
             try:
-                t.send_str("result   ")
                 t.send_str(result_str)
             except Exception as e:
                 print(f"Aviso: Erro ao enviar resultado para o jogador {t.player_number}: {e}")
@@ -128,11 +125,13 @@ class ThreadCliente(threading.Thread):
         self.data_structure.shuffle_deck()
         # Recebe messagens...
         while not last_request:
+            print("Cheguei aqui again!")
             with (self.gamestate.turn_lock):
+                print(f"Entrei no with!\n")
                 while (self.player_number != self.gamestate.actual_player()
                 or self.data_structure._players[str(self.player_number)].is_folded()):
                     self.gamestate.turn_lock.wait()
-
+                    print("Waiting!")
             # Turno do cliente
             self.send_str(OK_OP)
             self.send_obj(self.data_structure._community_cards)
@@ -155,7 +154,6 @@ class ThreadCliente(threading.Thread):
                 if not player.hand:
                     # O servidor envia 2 cartas ao jogador
                     self.data_structure.deal_hand(self.player_number, 2)
-                self.send_str("hand     ")
                 self.send_obj(player.hand)
 
                 print(player.hand)
@@ -189,14 +187,10 @@ class ThreadCliente(threading.Thread):
                 print(f"Jogador {self.player_number} desistiu da rodada.")
                 player = self.data_structure._players[str(self.player_number)]
                 player.fold()
-                self.gamestate.total_players -= 1
-                new_cards = self.gamestate.increment_state(self.data_structure)
+                self.gamestate.increment_state_fold()
 
                 if self.check_auto_win():
                     return
-
-                if new_cards:
-                    print(f"Novas cartas comunitárias: {new_cards}")
 
                 if self.gamestate.community_dealt == 5 and self.gamestate.actions_this_round == 0:
                     self.evaluate_and_announce_winner()

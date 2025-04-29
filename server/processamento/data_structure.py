@@ -58,6 +58,8 @@ class DataStructure:
     def add_name(self, name):
         pass
 
+    def get_player(self,nr: int):
+        return self._players[str(nr)]
 
     def add_player(self, player_id):
         """Adiciona um jogador"""

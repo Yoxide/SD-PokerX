@@ -33,18 +33,14 @@ fazer aposta (int) """ Pode apostar, passar ou desistir da rodada
 
 
 
-Por exemplo:
-- Entrar no jogo
-- Servidor distribui as cartas
-- Decisão: Aposto ou Desisto
-- Servidor revela as 3 primeiras cartas
+Objetivos Feitos:
+- Todos os clientes comunicam com o servidor e vice-versa
+- Os clientes conseguem jogar uma rodada de poker do princípio ao fim
 
-LOOP
-- Decisão: Aposto, Passo ou Desisto
-- Servidor: Revela mais uma carta
-- Decisão: Aposto, Passo ou Desisto
-- Servidor: Revela ainda mais uma carta
-- Decisão final: Aposto, Passo ou Desisto
+Objetivos a adicionar:
+- O jogador poder passar ou desistir
+- Controlar o número de fichas de cada jogador
+- Pygame
 
 
 

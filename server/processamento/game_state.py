@@ -30,7 +30,7 @@ class GameState:
 
                 if self.community_dealt == 0:
                     new_cards = data_structure.deal_community_cards(3)
-                elif self.community_dealt <= 5:
+                elif self.community_dealt < 5:
                     new_cards = data_structure.deal_community_cards(1)
 
                 self.community_dealt += len(new_cards)

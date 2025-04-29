@@ -58,7 +58,7 @@ class DataStructure:
     def add_name(self, name):
         pass
 
-    def get_player(self,nr: int):
+    def get_player(self, nr: int) -> Player:
         return self._players[str(nr)]
 
     def add_player(self, player_id):

@@ -1,7 +1,7 @@
 import threading
 import middleware.middleware as middle
 from server.processamento import game_state
-from server.skeleton import COMMAND_SIZE, DIST_OP, INT_SIZE, HIT_OP, PAS_OP, FLD_OP, BYE_OP, OK_OP
+from server.skeleton import COMMAND_SIZE, INT_SIZE, HIT_OP, PAS_OP, FLD_OP, BYE_OP, OK_OP
 from server.processamento.data_structure import DataStructure
 from server.processamento.player import Player
 from time import sleep
@@ -9,17 +9,19 @@ from time import sleep
 active_threads = []
 class ThreadCliente(threading.Thread):
 
-    def __init__(self, socket: middle.Socket, contador, gamestate: game_state.GameState, data_structure: DataStructure, player: Player):
+    def __init__(self, socket: middle.Socket, contador, gamestate: game_state.GameState, data_structure: DataStructure):
 
         threading.Thread.__init__(self)
         active_threads.append(self)
         self._socket = socket
         self.contador = contador
         self.gamestate = gamestate
-        self.player = player
         self.data_structure = data_structure
         self.address = self._socket.get_address()
         self.port = self._socket.get_port()
+        self.player_number = str(len(self.data_structure._players)) # Rever
+        self.data_structure.add_player(self.player_number) # Rever
+
 
     def receive_int(self,n_bytes: int) -> int:
         return self._socket.receive_int(n_bytes)
@@ -119,10 +121,13 @@ class ThreadCliente(threading.Thread):
     def run(self):
         last_request = False
 
-        self.gamestate.current_players.append(self.player)
-        self.player_number = self.gamestate.current_players.index(self.player)
-        self.send_int(self.player_number, INT_SIZE)
+
+        player = self.data_structure.get_player(self.player_number)
+        self.gamestate.current_players.append(player)
+        self.player_number = self.gamestate.current_players.index(player)
+        self.send_int(int(self.player_number), INT_SIZE)
         self.data_structure.shuffle_deck()
+
         # Recebe messagens...
         while not last_request:
             print("Cheguei aqui again!")
@@ -142,13 +147,10 @@ class ThreadCliente(threading.Thread):
             if request_type == HIT_OP:
                 print("O jogador vai a jogo")
                 b_value = self.receive_int(INT_SIZE)
-                aposta = self.player.bet(b_value)
+                aposta = player.bet(b_value)
                 print(f"O jogador apostou {aposta} fichas")
                 self.send_int(aposta, INT_SIZE)
                 print("Enviámos o valor da aposta para o jogador")
-
-                player_id = str(self.player_number)
-                player = self.data_structure._players[player_id]
 
                 # Na primeira ronda quando o jogador ainda não tem cartas
                 if not player.hand:
@@ -185,7 +187,6 @@ class ThreadCliente(threading.Thread):
 
             elif request_type == FLD_OP:
                 print(f"Jogador {self.player_number} desistiu da rodada.")
-                player = self.data_structure._players[str(self.player_number)]
                 player.fold()
                 self.gamestate.increment_state_fold()
 
@@ -194,7 +195,6 @@ class ThreadCliente(threading.Thread):
 
                 if self.gamestate.community_dealt == 5 and self.gamestate.actions_this_round == 0:
                     self.evaluate_and_announce_winner()
-
 
             elif request_type == BYE_OP:
                 print("Client ",self.address," disconnected!")

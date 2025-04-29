@@ -35,10 +35,11 @@ fazer aposta (int) """ Pode apostar, passar ou desistir da rodada
 
 Objetivos Feitos:
 - Todos os clientes comunicam com o servidor e vice-versa
-- Os clientes conseguem jogar uma rodada de poker do princípio ao fim
+- Os clientes conseguem jogar uma rodada de poker do princípio ao fim, podendo passar
 
 Objetivos a adicionar:
-- O jogador poder passar ou desistir
+- Implementar o Thread Update para anunciar o resultado corretamente
+- O jogador poder desistir
 - Controlar o número de fichas de cada jogador
 - Pygame
 

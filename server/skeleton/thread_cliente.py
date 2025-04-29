@@ -90,7 +90,7 @@ class ThreadCliente(threading.Thread):
             winner = active[0]
             result_str = f"Jogador {winner} venceu por desistência dos outros jogadores!"
             print(f"[AUTO-WIN] {result_str}")
-            #self.broadcast_result(result_str)
+            self.broadcast_result(result_str)
             self.reset_round()
             return True  # O jogo acaba
 

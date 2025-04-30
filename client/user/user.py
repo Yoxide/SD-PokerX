@@ -16,8 +16,7 @@ class User:
     def exec(self):
         turn = 0
         num = self.processar.receive_int(INT_SIZE)
-        player = self.data_structure.get_player(num)
-        player.set_hand(self.processar.cards_received())
+        hand = self.processar.receive_object()
         print(f"O teu número de jogador: {num}")
         while True:
             turn += 1
@@ -45,8 +44,7 @@ class User:
                     # quero fazer a aposta sem que se saiba que ela não é feita no cliente!
                     res = self.processar.bet(b_value)
                     print(f"Apostaste {res} fichas!")
-
-                    print(f"Aqui estão as tuas cartas: {player.hand}\n")
+                    print(f"Aqui estão as tuas cartas: {hand}\n")
                 case 2:
                     print("Desististe da rodada! Agora espera pela próxima!")
                     self.processar.fold()

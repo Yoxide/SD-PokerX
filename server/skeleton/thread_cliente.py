@@ -121,13 +121,16 @@ class ThreadCliente(threading.Thread):
     def run(self):
         last_request = False
 
-
         player = self.data_structure.get_player(self.player_number)
         self.gamestate.current_players.append(player)
         self.player_number = self.gamestate.current_players.index(player)
         self.send_int(int(self.player_number), INT_SIZE)
         self.data_structure.shuffle_deck()
+        # Na primeira ronda quando o jogador ainda não tem cartas
+        self.data_structure.deal_hand(self.player_number, 2) # O servidor envia 2 cartas ao jogador
+        self.send_obj(player.hand)
 
+        print(player.hand)
         # Recebe messagens...
         while not last_request:
             print("Cheguei aqui again!")
@@ -152,13 +155,6 @@ class ThreadCliente(threading.Thread):
                 self.send_int(aposta, INT_SIZE)
                 print("Enviámos o valor da aposta para o jogador")
 
-                # Na primeira ronda quando o jogador ainda não tem cartas
-                if not player.hand:
-                    # O servidor envia 2 cartas ao jogador
-                    self.data_structure.deal_hand(self.player_number, 2)
-                self.send_obj(player.hand)
-
-                print(player.hand)
                 print(self.data_structure.evaluate_hand(player.hand))
 
                 new_cards = self.gamestate.increment_state(self.data_structure)

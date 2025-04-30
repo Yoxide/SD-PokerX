@@ -1,12 +1,10 @@
 from client.stub import interface as processar, INT_SIZE
-from server.processamento.data_structure import DataStructure
 
 
 
 class User:
     def __init__(self, inter: processar):
         self.processar = inter
-        self.data_structure = DataStructure()
 
 
     def bet_value(self):

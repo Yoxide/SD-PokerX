@@ -25,6 +25,7 @@ class User:
             if turn == 4:
                 result = self.processar.receive_str(100)  # O vencedor
                 print(result)
+                return  # Se o prog não acabar, fica sempre à espera do "é a tua vez"
 
             ok = self.processar.receive_str(9)
 

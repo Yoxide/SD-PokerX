@@ -16,10 +16,11 @@ class ThreadCliente(threading.Thread):
         self._socket = socket
         self.contador = contador
         self.gamestate = gamestate
+        #self.player = None
         self.data_structure = data_structure
         self.address = self._socket.get_address()
         self.port = self._socket.get_port()
-        self.player_number = str(len(self.data_structure._players)) # Rever
+        self.player_number = str(len(self.gamestate.current_players)) # Rever
         self.data_structure.add_player(self.player_number) # Rever
 
 
@@ -34,7 +35,6 @@ class ThreadCliente(threading.Thread):
 
     def send_str(self, string: str):
         self._socket.send_str(string)
-
 
     def send_obj(self, obj: any) -> None:
         self._socket.send_object(obj)

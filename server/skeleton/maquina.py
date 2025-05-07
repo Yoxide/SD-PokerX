@@ -2,9 +2,13 @@ import socket
 import thread_cliente
 import contador
 import middleware.middleware as middle
+from middleware.middleware import Socket
 from server.processamento.game_state import GameState
 from server.processamento.data_structure import DataStructure
 from server.processamento.player import Player
+from server.skeleton.thread_update import ThreadUpdate
+from server.skeleton.clientes import Clientes
+
 
 class Maquina:
     def __init__(self,server_address,port):
@@ -16,6 +20,7 @@ class Maquina:
         have finished its interaction with the server.
 
         """
+        self.clientes = Clientes()
         self._socket = middle.Socket.start_socket_server(server_address,port,True)
         #self.port =port
         #self.s = socket.socket()
@@ -26,32 +31,38 @@ class Maquina:
         self.contador = contador.Contador()
         self.game_state = GameState()
         self.data_structure = DataStructure()
+        self.starting_update = False
         self._socket.settimeout(2.0)
-
+        self.updater = ThreadUpdate(self.data_structure,self.clientes, self._socket)
 
     def exec(self):
         #print("Waiting for clients to connect on port " + str(self.port))
         print("Waiting for clients to connect on port " + str(self._socket.get_port()))
 
         keep_running = True
-        first_connection = False
+        #first_connection = False
         while keep_running:
             try:
                 self._new_socket = self._socket.accept()
                 #connection, address = self.s.accept()
                 #print("Client " + str(address) + " just connected")
-                self.contador.incrementa()
-                first_connection = True
+                #self.contador.incrementa()
+                #first_connection = True
                 # Create and start a new ClientThread for each client connection
                 #tc = thread_cliente.ThreadCliente(connection, address, self.contador)
-                tc = thread_cliente.ThreadCliente(self._new_socket, self.contador, self.game_state, self.data_structure)
+                tc = thread_cliente.ThreadCliente(self._new_socket, self.contador, self.game_state, self.data_structure, self.clientes, self.updater )
                 tc.start()
 
             except socket.timeout:
             #except BlockingIOError:
-                print("Contagem:",self.contador.retorna_contagem())
-                if self.contador.retorna_contagem() == 0 and first_connection == True:
+                #print("Contagem:",self.contador.retorna_contagem())
+                if self.contador.retorna_contagem() == 0 and self.clientes.first_connection() == True:
                     keep_running = False
+
+                if self.contador.retorna_contagem() == 1 and self.starting_update == False:
+                    tu = ThreadUpdate(self.data_structure, self.clientes, self._new_socket)
+                    tu.start()
+                    self.starting_update = True
 
         self._socket.close()
         print("Server stopped")

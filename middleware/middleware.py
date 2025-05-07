@@ -5,7 +5,6 @@ import json
 
 class Socket:
 
-
     def __init__(self,connection, address, port):
         self.connection = connection
         self.address = address
@@ -62,6 +61,12 @@ class Socket:
         length = self.receive_int(4)
         data = self.connection.recv(length)
         return json.loads(data.decode())
+
+    #def send_update_object(self, connection, value, n_bytes):
+     #   msg = json.dumps(value).encode()
+      #  size = len(msg)
+       # self.send_int(connection, size, n_bytes)
+        #self.send_str(connection, msg)
 
     def close(self):
         self.connection.close()

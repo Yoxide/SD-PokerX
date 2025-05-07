@@ -5,11 +5,14 @@ from server.skeleton import COMMAND_SIZE, INT_SIZE, HIT_OP, PAS_OP, FLD_OP, BYE_
 from server.processamento.data_structure import DataStructure
 from server.processamento.player import Player
 from time import sleep
-
+from server.skeleton.clientes import Clientes
+from server.skeleton.thread_update import ThreadUpdate
 active_threads = []
+
+
 class ThreadCliente(threading.Thread):
 
-    def __init__(self, socket: middle.Socket, contador, gamestate: game_state.GameState, data_structure: DataStructure):
+    def __init__(self, socket: middle.Socket, contador, gamestate: game_state.GameState, data_structure: DataStructure, clientes: Clientes, update: ThreadUpdate):
 
         threading.Thread.__init__(self)
         active_threads.append(self)
@@ -22,7 +25,8 @@ class ThreadCliente(threading.Thread):
         self.port = self._socket.get_port()
         self.player_number = str(len(self.gamestate.current_players)) # Rever
         self.data_structure.add_player(self.player_number) # Rever
-
+        self.clientes = clientes
+        self.update = update
 
     def receive_int(self,n_bytes: int) -> int:
         return self._socket.receive_int(n_bytes)
@@ -66,7 +70,6 @@ class ThreadCliente(threading.Thread):
                 best_eval_name = self.data_structure.get_hand_name(rank_value)
 
             else:
-
                 if self.data_structure.compare_hands(full_hand, best_hand) == 1:
                     best_hand = full_hand
                     best_player = pid
@@ -75,7 +78,7 @@ class ThreadCliente(threading.Thread):
 
         print(f"\n🎉 Jogador vencedor: {best_player} com {best_eval_name} (Ranking: {best_eval})")
         result_str = f"Jogador {best_player} venceu com {best_eval_name}!"
-        self.broadcast_result(result_str)
+        self.update.broadcast_result(result_str)
         # Reinicia a ronda
         self.reset_round()
 
@@ -129,13 +132,11 @@ class ThreadCliente(threading.Thread):
         # Na primeira ronda quando o jogador ainda não tem cartas
         self.data_structure.deal_hand(self.player_number, 2) # O servidor envia 2 cartas ao jogador
         self.send_obj(player.hand)
-
+        #self.clientes.add_client(player)
         print(player.hand)
         # Recebe messagens...
         while not last_request:
-            print("Cheguei aqui again!")
             with (self.gamestate.turn_lock):
-                print(f"Entrei no with!\n")
                 while (self.player_number != self.gamestate.actual_player()
                 or self.data_structure._players[str(self.player_number)].is_folded()):
                     self.gamestate.turn_lock.wait()

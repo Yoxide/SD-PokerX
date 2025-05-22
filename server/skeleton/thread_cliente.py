@@ -78,7 +78,7 @@ class ThreadCliente(threading.Thread):
 
         print(f"\n🎉 Jogador vencedor: {best_player} com {best_eval_name} (Ranking: {best_eval})")
         result_str = f"Jogador {best_player} venceu com {best_eval_name}!"
-        self.update.broadcast_result(result_str)
+        self.broadcast_result(result_str)
         # Reinicia a ronda
         self.reset_round()
 
@@ -124,29 +124,48 @@ class ThreadCliente(threading.Thread):
     def run(self):
         last_request = False
 
-        player = self.data_structure.get_player(self.player_number)
-        self.gamestate.current_players.append(player)
-        self.player_number = self.gamestate.current_players.index(player)
-        self.send_int(int(self.player_number), INT_SIZE)
-        self.data_structure.shuffle_deck()
+#        player = self.data_structure.get_player(self.player_number)
+#        self.gamestate.current_players.append(player)
+#        self.player_number = self.gamestate.current_players.index(player)
+#        self.send_int(int(self.player_number), INT_SIZE)
+#        self.data_structure.shuffle_deck()
         # Na primeira ronda quando o jogador ainda não tem cartas
-        self.data_structure.deal_hand(self.player_number, 2) # O servidor envia 2 cartas ao jogador
-        self.send_obj(player.hand)
+#        self.data_structure.deal_hand(self.player_number, 2) # O servidor envia 2 cartas ao jogador
+#        self.send_obj(player.hand)
         #self.clientes.add_client(player)
-        print(player.hand)
+#        print(player.hand)
         # Recebe messagens...
         while not last_request:
-            with (self.gamestate.turn_lock):
-                while (self.player_number != self.gamestate.actual_player()
-                or self.data_structure._players[str(self.player_number)].is_folded()):
-                    self.gamestate.turn_lock.wait()
-                    print("Waiting!")
-            # Turno do cliente
-            self.send_str(OK_OP)
-            self.send_obj(self.data_structure._community_cards)
+
+            # with (self.gamestate.turn_lock):
+            #     while (self.player_number != self.gamestate.actual_player()
+            #     or self.data_structure._players[str(self.player_number)].is_folded()):
+            #         self.gamestate.turn_lock.wait()
+            #         print("Waiting!")
+            # # Turno do cliente
+            # self.send_str(OK_OP)
+            # self.send_obj(self.data_structure._community_cards)
 
             # Ação do jogador
             request_type = self.receive_str(COMMAND_SIZE)
+            if request_type == CON_OP:
+                self.player = self.data_structure.get_player(self.player_number)
+                self.gamestate.current_players.append(player)
+                self.player_number = self.gamestate.current_players.index(player)
+                self.send_int(int(self.player_number), INT_SIZE)
+
+            if request_type == HAND_OP:
+                # Na primeira ronda quando o jogador ainda não tem cartas
+                self.data_structure.deal_hand(self.player_number, 2) # O servidor envia 2 cartas ao jogador
+                self.send_obj(self.player.hand)
+                self.clientes.add_client(self.player)
+                print(self.player.hand)
+
+            if request_type == OK_OP:
+                # Verifica se é a vez de jogar do cliente
+                # Se for : True / 1
+                # Senão: False / 0 e depois mandam estado do jogo
+                pass
 
             if request_type == HIT_OP:
                 print("O jogador vai a jogo")

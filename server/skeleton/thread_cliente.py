@@ -166,10 +166,8 @@ class ThreadCliente(threading.Thread):
                 #self.clientes.add_client(self.player)
                 print(self.player.hand)
 
-            #elif request_type == NAME_OP:
-                #self.send_int(7, INT_SIZE)
-                #sleep(1)
-                #self.receive_str(INT_SIZE)
+            elif request_type == NAME_OP:
+                self.receive_str(9)
 
             elif request_type == OK_OP:
                 # Verifica se é a vez de jogar do cliente
@@ -192,7 +190,7 @@ class ThreadCliente(threading.Thread):
                 print(f"O jogador apostou {aposta} fichas")
                 self.send_int(aposta, INT_SIZE)
                 print("Enviámos o valor da aposta para o jogador")
-                #self.send_int(self.player.get_chips(), INT_SIZE)
+                self.send_int(self.player.get_chips(), INT_SIZE)
 
                 print(self.data_structure.evaluate_hand(self.player.hand))
                 new_cards = self.gamestate.increment_state(self.data_structure)

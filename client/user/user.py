@@ -1,6 +1,6 @@
 import pygame
 from client.stub import interface as processar, INT_SIZE
-from client.stub import OK_OP, CON_OP, HAND_OP
+from client.stub import OK_OP, CON_OP, HAND_OP, NAME_OP
 from time import sleep
 
 CARD_WIDTH, CARD_HEIGHT = 55, 80
@@ -15,6 +15,8 @@ class User:
         pygame.display.set_caption("Texas Hold'em Poker")
         self.clock = pygame.time.Clock()
         self.running = True
+        self.player_name = ""
+        self.player_number = -1
 
         self.load_assets()
 
@@ -70,6 +72,13 @@ class User:
             text = self.font.render(message, True, (0, 0, 0))
             self.screen.blit(text, (WIDTH // 2 - 100, 220))
 
+        if self.player_name:
+            name_text = self.font.render(self.player_name, True, (0, 0, 0))
+            if self.player_number == 0:
+                self.screen.blit(name_text, (110, 375))  # near caixa1
+            elif self.player_number == 1:
+                self.screen.blit(name_text, (780, 400))  # near caixa2
+
         pygame.display.flip()
 
     def get_action_click(self):
@@ -91,11 +100,43 @@ class User:
     def bet_value(self):
         return 50  # Placeholder
 
+    def get_name_input(self):
+        name = ""
+        input_active = True
+        input_box = pygame.Rect(WIDTH // 2 - 100, HEIGHT // 2, 200, 40)
+        input_color = pygame.Color('lightskyblue3')
+
+        while input_active:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    self.running = False
+                    return ""
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_RETURN:
+                        input_active = False
+                    elif event.key == pygame.K_BACKSPACE:
+                        name = name[:-1]
+                    else:
+                        if len(name) < 12:  # limit length
+                            name += event.unicode
+
+            self.screen.blit(self.background, (0, 0))
+            pygame.draw.rect(self.screen, input_color, input_box, 2)
+            txt_surface = self.font.render("Nome: " + name, True, (255, 255, 255))
+            self.screen.blit(txt_surface, (input_box.x + 5, input_box.y + 5))
+            pygame.display.flip()
+            self.clock.tick(30)
+
+        return name
+
     def exec(self):
         self.processar.send_str(CON_OP)
-        num = self.processar.receive_int(INT_SIZE)
+        self.player_number = self.processar.receive_int(INT_SIZE)
         self.processar.send_str(HAND_OP)
         hand = self.processar.receive_object()
+        self.processar.send_str(NAME_OP)
+        self.player_name = self.get_name_input()
+        self.processar.send_str(self.player_name)
 
         community_cards = []
         while self.running:
@@ -114,7 +155,7 @@ class User:
                         b_value = self.bet_value()
                         res = self.processar.bet(b_value)
                         self.display_gui(hand, community_cards, f"Apostaste {res} fichas!")
-                        #player_current_chips = self.processar.receive_int(INT_SIZE)
+                        player_current_chips = self.processar.receive_int(INT_SIZE)
                     case 2:
                         self.processar.fold()
                         self.display_gui(hand, community_cards, "Desististe!")

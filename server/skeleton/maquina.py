@@ -33,7 +33,7 @@ class Maquina:
         self.data_structure = DataStructure()
         self.starting_update = False
         self._socket.settimeout(2.0)
-        self.updater = ThreadUpdate(self.data_structure,self.clientes, self._socket)
+        self.updater = ThreadUpdate(self.data_structure,self.clientes, self._socket, self.game_state)
 
     def exec(self):
         #print("Waiting for clients to connect on port " + str(self.port))
@@ -59,8 +59,8 @@ class Maquina:
                 if self.contador.retorna_contagem() == 0 and self.clientes.first_connection() == True:
                     keep_running = False
 
-                if self.contador.retorna_contagem() == 1 and self.starting_update == False:
-                    tu = ThreadUpdate(self.data_structure, self.clientes, self._new_socket)
+                if self.contador.retorna_contagem() >= 1 and self.starting_update == False:
+                    tu = ThreadUpdate(self.data_structure, self.clientes, self._new_socket, self.game_state)
                     tu.start()
                     self.starting_update = True
 

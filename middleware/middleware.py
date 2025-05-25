@@ -62,11 +62,14 @@ class Socket:
         data = self.connection.recv(length)
         return json.loads(data.decode())
 
-    #def send_update_object(self, connection, value, n_bytes):
-     #   msg = json.dumps(value).encode()
-      #  size = len(msg)
-       # self.send_int(connection, size, n_bytes)
-        #self.send_str(connection, msg)
+    #def send_update_int(self, connection, value, n_bytes):
+        #connection.send(value.to_bytes(n_bytes, byteorder="big", signed=True))
+
+    def send_update_object(self, connection, value, n_bytes):
+        msg = json.dumps(value).encode()
+        size = len(msg)
+        self.connection.send_int(size, n_bytes)
+        self.connection.send_str(msg)
 
     def close(self):
         self.connection.close()

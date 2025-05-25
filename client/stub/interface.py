@@ -23,7 +23,6 @@ class Interface:
     #     return (res1, res2)
 
     def send_str(self,s: str):
-        print("Sending str:",s)
         self._socket.send_str(s)
 
     def receive_str(self,n_bytes:int)-> str:

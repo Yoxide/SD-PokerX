@@ -17,6 +17,9 @@ class Player:
     def set_bet(self, value:int) -> None:
         self._bets.append(value)
 
+    def get_chips(self):
+        return self.chips
+
     def get_name(self) -> str:
         return self._name
 

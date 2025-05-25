@@ -1,7 +1,7 @@
 import threading
 import middleware.middleware as middle
 from server.processamento import game_state
-from server.skeleton import COMMAND_SIZE, INT_SIZE, HIT_OP, PAS_OP, FLD_OP, BYE_OP, OK_OP
+from server.skeleton import COMMAND_SIZE, INT_SIZE, HIT_OP, PAS_OP, FLD_OP, BYE_OP, OK_OP, CON_OP, HAND_OP, NAME_OP
 from server.processamento.data_structure import DataStructure
 from server.processamento.player import Player
 from time import sleep
@@ -27,6 +27,7 @@ class ThreadCliente(threading.Thread):
         self.data_structure.add_player(self.player_number) # Rever
         self.clientes = clientes
         self.update = update
+        self.players_announced = 0
 
     def receive_int(self,n_bytes: int) -> int:
         return self._socket.receive_int(n_bytes)
@@ -47,6 +48,8 @@ class ThreadCliente(threading.Thread):
         return self._socket.receive_object()
 
     def evaluate_and_announce_winner(self):
+        self.players_announced += 1
+
         best_player = None
         best_hand = None
         best_eval = None
@@ -79,8 +82,10 @@ class ThreadCliente(threading.Thread):
         print(f"\n🎉 Jogador vencedor: {best_player} com {best_eval_name} (Ranking: {best_eval})")
         result_str = f"Jogador {best_player} venceu com {best_eval_name}!"
         self.broadcast_result(result_str)
-        # Reinicia a ronda
-        self.reset_round()
+
+        if self.players_announced == len(self.gamestate.current_players):
+            # Reinicia a ronda
+            self.reset_round()
 
         self.data_structure.shuffle_deck()
 
@@ -104,6 +109,7 @@ class ThreadCliente(threading.Thread):
         self.data_structure._community_cards.clear()
         self.gamestate.community_dealt = 0
         self.gamestate.actions_this_round = 0
+        self.players_announced = 0
 
         # Limpa todos os dados do jogador
         for player in self.data_structure._players.values():
@@ -112,7 +118,6 @@ class ThreadCliente(threading.Thread):
         # Acorda todas as threads
         with self.gamestate.turn_lock:
             self.gamestate.turn_lock.notify_all()
-
 
     def broadcast_result(self, result_str):
         for t in active_threads:
@@ -124,16 +129,16 @@ class ThreadCliente(threading.Thread):
     def run(self):
         last_request = False
 
-#        player = self.data_structure.get_player(self.player_number)
-#        self.gamestate.current_players.append(player)
-#        self.player_number = self.gamestate.current_players.index(player)
-#        self.send_int(int(self.player_number), INT_SIZE)
-#        self.data_structure.shuffle_deck()
+        #        player = self.data_structure.get_player(self.player_number)
+        #        self.gamestate.current_players.append(player)
+        #        self.player_number = self.gamestate.current_players.index(player)
+        #        self.send_int(int(self.player_number), INT_SIZE)
+        #        self.data_structure.shuffle_deck()
         # Na primeira ronda quando o jogador ainda não tem cartas
-#        self.data_structure.deal_hand(self.player_number, 2) # O servidor envia 2 cartas ao jogador
-#        self.send_obj(player.hand)
-        #self.clientes.add_client(player)
-#        print(player.hand)
+        #        self.data_structure.deal_hand(self.player_number, 2) # O servidor envia 2 cartas ao jogador
+        #        self.send_obj(player.hand)
+        # self.clientes.add_client(player)
+        #        print(player.hand)
         # Recebe messagens...
         while not last_request:
 
@@ -150,33 +155,46 @@ class ThreadCliente(threading.Thread):
             request_type = self.receive_str(COMMAND_SIZE)
             if request_type == CON_OP:
                 self.player = self.data_structure.get_player(self.player_number)
-                self.gamestate.current_players.append(player)
-                self.player_number = self.gamestate.current_players.index(player)
+                self.gamestate.current_players.append(self.player)
+                self.player_number = self.gamestate.current_players.index(self.player)
                 self.send_int(int(self.player_number), INT_SIZE)
 
-            if request_type == HAND_OP:
+            elif request_type == HAND_OP:
                 # Na primeira ronda quando o jogador ainda não tem cartas
-                self.data_structure.deal_hand(self.player_number, 2) # O servidor envia 2 cartas ao jogador
+                self.data_structure.deal_hand(self.player_number, 2)  # O servidor envia 2 cartas ao jogador
                 self.send_obj(self.player.hand)
-                self.clientes.add_client(self.player)
+                #self.clientes.add_client(self.player)
                 print(self.player.hand)
 
-            if request_type == OK_OP:
+            #elif request_type == NAME_OP:
+                #self.send_int(7, INT_SIZE)
+                #sleep(1)
+                #self.receive_str(INT_SIZE)
+
+            elif request_type == OK_OP:
                 # Verifica se é a vez de jogar do cliente
                 # Se for : True / 1
                 # Senão: False / 0 e depois mandam estado do jogo
-                pass
+                if self.gamestate.community_dealt == 5:
+                    self.send_int(2, INT_SIZE)
+                    self.evaluate_and_announce_winner()
+
+                elif self.player_number == self.gamestate.actual_player():
+                    self.send_int(1, INT_SIZE)
+                    self.send_obj(self.data_structure._community_cards)
+                else:
+                    self.send_int(0, INT_SIZE)
 
             if request_type == HIT_OP:
                 print("O jogador vai a jogo")
                 b_value = self.receive_int(INT_SIZE)
-                aposta = player.bet(b_value)
+                aposta = self.player.bet(b_value)
                 print(f"O jogador apostou {aposta} fichas")
                 self.send_int(aposta, INT_SIZE)
                 print("Enviámos o valor da aposta para o jogador")
+                #self.send_int(self.player.get_chips(), INT_SIZE)
 
-                print(self.data_structure.evaluate_hand(player.hand))
-
+                print(self.data_structure.evaluate_hand(self.player.hand))
                 new_cards = self.gamestate.increment_state(self.data_structure)
 
                 if self.check_auto_win():
@@ -185,8 +203,8 @@ class ThreadCliente(threading.Thread):
                 if new_cards:
                     print(f"Novas cartas comunitárias: {new_cards}")
 
-                if self.gamestate.community_dealt == 5 and self.gamestate.actions_this_round == 0:
-                    self.evaluate_and_announce_winner()
+            #if self.gamestate.community_dealt == 5 and self.gamestate.actions_this_round == 0:
+                #self.evaluate_and_announce_winner()
 
             elif request_type == PAS_OP:
                 print(f"O Jogador {self.player_number} passou.")
@@ -203,7 +221,7 @@ class ThreadCliente(threading.Thread):
 
             elif request_type == FLD_OP:
                 print(f"Jogador {self.player_number} desistiu da rodada.")
-                player.fold()
+                self.player.fold()
                 self.gamestate.increment_state_fold()
 
                 if self.check_auto_win():

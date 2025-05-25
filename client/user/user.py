@@ -17,6 +17,7 @@ class User:
         self.running = True
         self.player_name = ""
         self.player_number = -1
+        self.current_chips = 0
 
         self.load_assets()
 
@@ -75,9 +76,17 @@ class User:
         if self.player_name:
             name_text = self.font.render(self.player_name, True, (0, 0, 0))
             if self.player_number == 0:
-                self.screen.blit(name_text, (110, 375))  # near caixa1
+                self.screen.blit(name_text, (111, 375))  # near caixa1
             elif self.player_number == 1:
                 self.screen.blit(name_text, (780, 400))  # near caixa2
+
+        if self.current_chips:
+            chips_text = self.font.render(f"Fichas: {str(self.current_chips)}", True, (255, 255, 255))
+            if self.player_number == 0:
+                self.screen.blit(chips_text, (111, 407))
+            elif self.player_number == 1:
+                self.screen.blit(chips_text, (780, 400))
+
 
         pygame.display.flip()
 
@@ -155,7 +164,7 @@ class User:
                         b_value = self.bet_value()
                         res = self.processar.bet(b_value)
                         self.display_gui(hand, community_cards, f"Apostaste {res} fichas!")
-                        player_current_chips = self.processar.receive_int(INT_SIZE)
+                        self.current_chips = self.processar.receive_int(INT_SIZE)
                     case 2:
                         self.processar.fold()
                         self.display_gui(hand, community_cards, "Desististe!")

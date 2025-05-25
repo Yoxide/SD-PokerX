@@ -78,14 +78,14 @@ class User:
             if self.player_number == 0:
                 self.screen.blit(name_text, (111, 375))  # near caixa1
             elif self.player_number == 1:
-                self.screen.blit(name_text, (780, 400))  # near caixa2
+                self.screen.blit(name_text, (914, 375))  # near caixa2
 
         if self.current_chips:
             chips_text = self.font.render(f"Fichas: {str(self.current_chips)}", True, (255, 255, 255))
             if self.player_number == 0:
                 self.screen.blit(chips_text, (111, 407))
             elif self.player_number == 1:
-                self.screen.blit(chips_text, (780, 400))
+                self.screen.blit(chips_text, (914, 407))
 
 
         pygame.display.flip()

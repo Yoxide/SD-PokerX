@@ -141,15 +141,7 @@ class ThreadCliente(threading.Thread):
         #        print(player.hand)
         # Recebe messagens...
         while not last_request:
-
-            # with (self.gamestate.turn_lock):
-            #     while (self.player_number != self.gamestate.actual_player()
-            #     or self.data_structure._players[str(self.player_number)].is_folded()):
-            #         self.gamestate.turn_lock.wait()
-            #         print("Waiting!")
-            # # Turno do cliente
-            # self.send_str(OK_OP)
-            # self.send_obj(self.data_structure._community_cards)
+            self.data_structure.shuffle_deck()
 
             # Ação do jogador
             request_type = self.receive_str(COMMAND_SIZE)

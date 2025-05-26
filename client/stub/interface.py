@@ -85,7 +85,8 @@ class Interface:
 
     def get_opponent_name(self) -> str:
         self.send_str(OPPN_OP)
-        return self.receive_str(1000)  # or adjust if longer names are allowed
+        name = self.receive_str(100)
+        return name  # or adjust if longer names are allowed
 
     def get_opponent_chips(self) -> int:
         self.send_str(OPPC_OP)

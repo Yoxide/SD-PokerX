@@ -81,24 +81,24 @@ class User:
 
         # Player's name and chips
         if self.player_name:
-            name_text = self.font.render(self.player_name, True, (0, 0, 0))
-            chips_text = self.font.render(f"Fichas: {self.current_chips}", True, (255, 255, 255))
+            name_text = self.font.render(self.player_name, True, (255, 255, 255))
+            chips_text = self.font.render(f"Fichas:{self.current_chips}", True, (255, 255, 255))
             if self.player_number == 0:
-                self.screen.blit(name_text, (111, 375))
-                self.screen.blit(chips_text, (111, 407))
+                self.screen.blit(name_text, (110, 375))
+                self.screen.blit(chips_text, (110, 407))
             else:
-                self.screen.blit(name_text, (914, 375))
-                self.screen.blit(chips_text, (914, 407))
+                self.screen.blit(name_text, (911, 375))
+                self.screen.blit(chips_text, (911, 407))
 
         # Opponent's name and chips
-        opp_name_text = self.font.render(self.opponent_name, True, (0, 0, 0))
-        opp_chips_text = self.font.render(f"Fichas: {self.opponent_chips}", True, (255, 255, 255))
+        opp_name_text = self.font.render(self.opponent_name, True, (255, 255, 255))
+        opp_chips_text = self.font.render(f"Fichas:{self.opponent_chips}", True, (255, 255, 255))
         if self.player_number == 0:
-            self.screen.blit(opp_name_text, (914, 375))
-            self.screen.blit(opp_chips_text, (914, 407))
+            self.screen.blit(opp_name_text, (911, 375))
+            self.screen.blit(opp_chips_text, (911, 407))
         else:
-            self.screen.blit(opp_name_text, (111, 375))
-            self.screen.blit(opp_chips_text, (111, 407))
+            self.screen.blit(opp_name_text, (110, 375))
+            self.screen.blit(opp_chips_text, (110, 407))
 
         pygame.display.flip()
 
@@ -207,4 +207,3 @@ class User:
                 sleep(1)
 
         pygame.quit()
-

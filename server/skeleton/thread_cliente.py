@@ -180,10 +180,11 @@ class ThreadCliente(threading.Thread):
 
             elif request_type == OPPN_OP:
                 if self.gamestate.actual_player() == 0:
-                    self.send_str(self.gamestate.current_players[1].get_name())
+                    nome = self.gamestate.current_players[1].get_name()
+                    self.send_str(nome)
                 else:
-                    print(self.gamestate.current_players[0].get_name())
-                    self.send_str(self.gamestate.current_players[0].get_name())
+                    nome = self.gamestate.current_players[0].get_name()
+                    self.send_str(nome)
 
             elif request_type == OPPC_OP:
                 if self.gamestate.actual_player() == 0:

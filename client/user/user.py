@@ -4,7 +4,7 @@ from client.stub import OK_OP, CON_OP, HAND_OP, NAME_OP
 from time import sleep
 
 CARD_WIDTH, CARD_HEIGHT = 55, 80
-WIDTH, HEIGHT = 1050, 590  # Match client.py
+WIDTH, HEIGHT = 1050, 590
 GREEN = (34, 139, 34)
 
 class User:
@@ -15,9 +15,15 @@ class User:
         pygame.display.set_caption("Texas Hold'em Poker")
         self.clock = pygame.time.Clock()
         self.running = True
+
         self.player_name = ""
         self.player_number = -1
-        self.current_chips = 0
+        self.current_chips = 100
+
+        self.opponent_name = ""
+        self.opponent_chips = 100
+
+        self.turn = 0
 
         self.load_assets()
 
@@ -26,7 +32,6 @@ class User:
         ratio = min(max_width / original_width, max_height / original_height)
         new_size = (int(original_width * ratio), int(original_height * ratio))
         return pygame.transform.smoothscale(image, new_size)
-
 
     def load_assets(self):
         self.card_images = {
@@ -74,20 +79,26 @@ class User:
             text = self.font.render(message, True, (0, 0, 0))
             self.screen.blit(text, (WIDTH // 2 - 100, 220))
 
+        # Player's name and chips
         if self.player_name:
             name_text = self.font.render(self.player_name, True, (0, 0, 0))
+            chips_text = self.font.render(f"Fichas: {self.current_chips}", True, (255, 255, 255))
             if self.player_number == 0:
-                self.screen.blit(name_text, (111, 375))  # near caixa1
-            elif self.player_number == 1:
-                self.screen.blit(name_text, (914, 375))  # near caixa2
-
-        if self.current_chips:
-            chips_text = self.font.render(f"Fichas: {str(self.current_chips)}", True, (255, 255, 255))
-            if self.player_number == 0:
+                self.screen.blit(name_text, (111, 375))
                 self.screen.blit(chips_text, (111, 407))
-            elif self.player_number == 1:
+            else:
+                self.screen.blit(name_text, (914, 375))
                 self.screen.blit(chips_text, (914, 407))
 
+        # Opponent's name and chips
+        opp_name_text = self.font.render(self.opponent_name, True, (0, 0, 0))
+        opp_chips_text = self.font.render(f"Fichas: {self.opponent_chips}", True, (255, 255, 255))
+        if self.player_number == 0:
+            self.screen.blit(opp_name_text, (914, 375))
+            self.screen.blit(opp_chips_text, (914, 407))
+        else:
+            self.screen.blit(opp_name_text, (111, 375))
+            self.screen.blit(opp_chips_text, (111, 407))
 
         pygame.display.flip()
 
@@ -110,7 +121,7 @@ class User:
             self.clock.tick(30)
 
     def bet_value(self):
-        return 50  # Placeholder
+        return 20  # Can be made dynamic if needed
 
     def get_name_input(self):
         name = ""
@@ -129,7 +140,7 @@ class User:
                     elif event.key == pygame.K_BACKSPACE:
                         name = name[:-1]
                     else:
-                        if len(name) < 12:  # limit length
+                        if len(name) < 12:
                             name += event.unicode
 
             self.screen.blit(self.background, (0, 0))
@@ -150,8 +161,14 @@ class User:
         self.player_name = self.get_name_input()
         self.processar.send_str(self.player_name)
 
+        self.current_chips = self.processar.receive_int(INT_SIZE)
+
         community_cards = []
         while self.running:
+            if self.turn > 0:
+                #self.opponent_name = self.processar.get_opponent_name()
+                self.opponent_chips = self.processar.get_opponent_chips()
+
             self.processar.send_str(OK_OP)
             res = self.processar.receive_int(INT_SIZE)
 
@@ -162,18 +179,25 @@ class User:
                 option = self.get_action_click()
                 if option is None:
                     break
+
                 match option:
                     case 1:
                         b_value = self.bet_value()
                         res = self.processar.bet(b_value)
-                        self.display_gui(hand, community_cards, f"Apostaste {res} fichas!")
                         self.current_chips = self.processar.receive_int(INT_SIZE)
+                        if self.turn > 0:
+                            self.opponent_chips = self.processar.get_opponent_chips()
+                        self.display_gui(hand, community_cards, f"Apostaste {res} fichas!")
+                        self.turn += 1
+                        print(self.turn)
                     case 2:
                         self.processar.fold()
                         self.display_gui(hand, community_cards, "Desististe!")
+                        self.turn += 1
                     case 3:
                         self.processar.pass_turn()
                         self.display_gui(hand, community_cards, "Passaste!")
+                        self.turn += 1
             elif res == 2:
                 result = self.processar.receive_str(100)
                 self.display_gui(hand, community_cards, result)
@@ -183,3 +207,4 @@ class User:
                 sleep(1)
 
         pygame.quit()
+

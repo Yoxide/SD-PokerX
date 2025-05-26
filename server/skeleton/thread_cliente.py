@@ -1,7 +1,7 @@
 import threading
 import middleware.middleware as middle
 from server.processamento import game_state
-from server.skeleton import COMMAND_SIZE, INT_SIZE, HIT_OP, PAS_OP, FLD_OP, BYE_OP, OK_OP, CON_OP, HAND_OP, NAME_OP
+from server.skeleton import COMMAND_SIZE, INT_SIZE, HIT_OP, PAS_OP, FLD_OP, BYE_OP, OK_OP, CON_OP, HAND_OP, NAME_OP, OPPN_OP, OPPC_OP
 from server.processamento.data_structure import DataStructure
 from server.processamento.player import Player
 from time import sleep
@@ -159,7 +159,9 @@ class ThreadCliente(threading.Thread):
                 print(self.player.hand)
 
             elif request_type == NAME_OP:
-                self.receive_str(9)
+                name = self.receive_str(100)
+                self.gamestate.current_players[self.gamestate.actual_player()].set_name(name)
+                self.send_int(self.gamestate.current_players[self.gamestate.actual_player()].get_chips(), INT_SIZE)
 
             elif request_type == OK_OP:
                 # Verifica se é a vez de jogar do cliente
@@ -172,8 +174,22 @@ class ThreadCliente(threading.Thread):
                 elif self.player_number == self.gamestate.actual_player():
                     self.send_int(1, INT_SIZE)
                     self.send_obj(self.data_structure._community_cards)
+
                 else:
                     self.send_int(0, INT_SIZE)
+
+            elif request_type == OPPN_OP:
+                if self.gamestate.actual_player() == 0:
+                    self.send_str(self.gamestate.current_players[1].get_name())
+                else:
+                    print(self.gamestate.current_players[0].get_name())
+                    self.send_str(self.gamestate.current_players[0].get_name())
+
+            elif request_type == OPPC_OP:
+                if self.gamestate.actual_player() == 0:
+                    self.send_int(self.gamestate.current_players[1].get_chips(), INT_SIZE)
+                else:
+                    self.send_int(self.gamestate.current_players[0].get_chips(), INT_SIZE)
 
             if request_type == HIT_OP:
                 print("O jogador vai a jogo")

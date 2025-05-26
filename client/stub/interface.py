@@ -1,7 +1,7 @@
 import middleware.middleware as middle
 
 
-from client.stub import COMMAND_SIZE, INT_SIZE, HIT_OP, PAS_OP, FLD_OP, BYE_OP, LIST_SIZE
+from client.stub import COMMAND_SIZE, INT_SIZE, HIT_OP, PAS_OP, FLD_OP, BYE_OP, LIST_SIZE, OPPC_OP, OPPN_OP
 from server.skeleton import DIST_OP
 
 
@@ -82,6 +82,14 @@ class Interface:
     def fold(self) -> int:
         self.send_str(FLD_OP)
         return 0
+
+    def get_opponent_name(self) -> str:
+        self.send_str(OPPN_OP)
+        return self.receive_str(1000)  # or adjust if longer names are allowed
+
+    def get_opponent_chips(self) -> int:
+        self.send_str(OPPC_OP)
+        return self.receive_int(INT_SIZE)
 
     # def exec(self):
     #     # Operação de soma

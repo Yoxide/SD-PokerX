@@ -27,6 +27,7 @@ class User:
         new_size = (int(original_width * ratio), int(original_height * ratio))
         return pygame.transform.smoothscale(image, new_size)
 
+
     def load_assets(self):
         self.card_images = {
             f"{rank}-{suit}": pygame.transform.smoothscale(
@@ -44,9 +45,9 @@ class User:
         self.caixa1 = self.resize_with_aspect_ratio(load_full("UI/caixinhas.png"), 900, 900)
         self.caixa2 = self.resize_with_aspect_ratio(load_full("UI/caixinhas.png"), 900, 900)
 
-        self.btn_apostar = self.resize_with_aspect_ratio(load_full("UI/apostar.png"), 900, 900)
-        self.btn_passar = self.resize_with_aspect_ratio(load_full("UI/passar.png"), 900, 900)
-        self.btn_desistir = self.resize_with_aspect_ratio(load_full("UI/desistir.png"), 900, 900)
+        self.btn_apostar = self.resize_with_aspect_ratio(load_full("UI/apostar.png"), 130, 60)
+        self.btn_passar = self.resize_with_aspect_ratio(load_full("UI/passar.png"), 130, 60)
+        self.btn_desistir = self.resize_with_aspect_ratio(load_full("UI/desistir.png"), 130, 60)
 
         self.font = pygame.font.SysFont("Arial", 20)
 
@@ -63,9 +64,9 @@ class User:
         self.screen.blit(self.caixa1, (-300, 150))
         self.screen.blit(self.caixa2, (500, 150))
 
-        self.apostar_rect = self.screen.blit(self.btn_apostar, (-50, -200))
-        self.passar_rect = self.screen.blit(self.btn_passar, (100, -200))
-        self.desistir_rect = self.screen.blit(self.btn_desistir, (250, -200))
+        self.apostar_rect = self.screen.blit(self.btn_apostar, (350, 25))
+        self.passar_rect = self.screen.blit(self.btn_passar, (500, 25))
+        self.desistir_rect = self.screen.blit(self.btn_desistir, (650, 25))
 
         self.draw_cards(hand, community_cards)
 
@@ -104,6 +105,8 @@ class User:
                         return 3
                     elif self.desistir_rect.collidepoint(x, y):
                         return 2
+
+            pygame.display.flip()
             self.clock.tick(30)
 
     def bet_value(self):

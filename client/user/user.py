@@ -11,6 +11,7 @@ class User:
     def __init__(self, inter: processar):
         self.processar = inter
         pygame.init()
+        pygame.mixer.init()
         self.screen = pygame.display.set_mode((WIDTH, HEIGHT))
         pygame.display.set_caption("Texas Hold'em Poker")
         self.clock = pygame.time.Clock()
@@ -20,7 +21,7 @@ class User:
         self.player_number = -1
         self.current_chips = 100
 
-        self.opponent_name = ""
+        self.opponent_name = "Oponente"
         self.opponent_chips = 100
 
         self.turn = 0
@@ -157,10 +158,17 @@ class User:
         self.player_number = self.processar.receive_int(INT_SIZE)
         self.processar.send_str(HAND_OP)
         hand = self.processar.receive_object()
+
+        pygame.mixer.music.load("sounds/cake.mp3")
+        pygame.mixer.music.play()
         self.processar.send_str(NAME_OP)
         self.player_name = self.get_name_input()
         self.processar.send_str(self.player_name)
 
+        pygame.mixer.music.unload()
+
+        pygame.mixer.music.load("sounds/whirlwind.mp3")
+        pygame.mixer.music.play()
         self.current_chips = self.processar.receive_int(INT_SIZE)
 
         community_cards = []

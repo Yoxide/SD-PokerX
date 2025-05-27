@@ -169,6 +169,7 @@ class ThreadCliente(threading.Thread):
                 # Senão: False / 0 e depois mandam estado do jogo
                 if self.gamestate.community_dealt == 5:
                     self.send_int(2, INT_SIZE)
+                    self.send_obj(self.data_structure._community_cards)
                     self.evaluate_and_announce_winner()
 
                 elif self.player_number == self.gamestate.actual_player():

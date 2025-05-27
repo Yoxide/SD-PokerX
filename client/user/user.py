@@ -207,6 +207,7 @@ class User:
                         self.display_gui(hand, community_cards, "Passaste!")
                         self.turn += 1
             elif res == 2:
+                community_cards = self.processar.receive_object()
                 result = self.processar.receive_str(100)
                 self.display_gui(hand, community_cards, result)
                 sleep(3)

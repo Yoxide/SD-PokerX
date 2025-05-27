@@ -168,7 +168,8 @@ class User:
         pygame.mixer.music.unload()
 
         pygame.mixer.music.load("sounds/whirlwind.mp3")
-        pygame.mixer.music.play()
+        pygame.mixer.music.play(loops=-1)
+
         self.current_chips = self.processar.receive_int(INT_SIZE)
 
         community_cards = []
@@ -214,4 +215,5 @@ class User:
             else:
                 sleep(1)
 
+        pygame.mixer.music.stop()
         pygame.quit()

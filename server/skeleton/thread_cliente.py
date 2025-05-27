@@ -223,8 +223,8 @@ class ThreadCliente(threading.Thread):
                 if new_cards:
                     print(f"Novas cartas comunitárias: {new_cards}")
 
-                if self.gamestate.community_dealt == 5 and self.gamestate.actions_this_round == 0:
-                    self.evaluate_and_announce_winner()
+                #if self.gamestate.community_dealt == 5 and self.gamestate.actions_this_round == 0:
+                    #self.evaluate_and_announce_winner()
 
             elif request_type == FLD_OP:
                 print(f"Jogador {self.player_number} desistiu da rodada.")
@@ -234,8 +234,8 @@ class ThreadCliente(threading.Thread):
                 if self.check_auto_win():
                     return
 
-                if self.gamestate.community_dealt == 5 and self.gamestate.actions_this_round == 0:
-                    self.evaluate_and_announce_winner()
+                #if self.gamestate.community_dealt == 5 and self.gamestate.actions_this_round == 0:
+                    #self.evaluate_and_announce_winner()
 
             elif request_type == BYE_OP:
                 print("Client ",self.address," disconnected!")

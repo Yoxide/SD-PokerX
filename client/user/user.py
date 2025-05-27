@@ -198,7 +198,6 @@ class User:
                             self.opponent_chips = self.processar.get_opponent_chips()
                         self.display_gui(hand, community_cards, f"Apostaste {res} fichas!")
                         self.turn += 1
-                        print(self.turn)
                     case 2:
                         self.processar.fold()
                         self.display_gui(hand, community_cards, "Desististe!")

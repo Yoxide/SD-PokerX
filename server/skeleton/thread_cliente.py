@@ -1,7 +1,7 @@
 import threading
 import middleware.middleware as middle
 from server.processamento import game_state
-from server.skeleton import COMMAND_SIZE, INT_SIZE, HIT_OP, PAS_OP, FLD_OP, BYE_OP, OK_OP, CON_OP, HAND_OP, NAME_OP, OPPN_OP, OPPC_OP
+from server.skeleton import COMMAND_SIZE, INT_SIZE, HIT_OP, PAS_OP, FLD_OP, BYE_OP, OK_OP, RETRY_OP, CON_OP, HAND_OP, NAME_OP, OPPN_OP, OPPC_OP
 from server.processamento.data_structure import DataStructure
 from server.processamento.player import Player
 from time import sleep
@@ -83,9 +83,9 @@ class ThreadCliente(threading.Thread):
         result_str = f"Jogador {best_player} venceu com {best_eval_name}!"
         self.broadcast_result(result_str)
 
-        if self.players_announced == len(self.gamestate.current_players):
+        #if self.players_announced == len(self.gamestate.current_players):
             # Reinicia a ronda
-            self.reset_round()
+            #self.reset_round()
 
         self.data_structure.shuffle_deck()
 
@@ -178,6 +178,10 @@ class ThreadCliente(threading.Thread):
 
                 else:
                     self.send_int(0, INT_SIZE)
+
+            elif request_type == RETRY_OP:
+                self.send_obj(self.data_structure._community_cards)
+                self.evaluate_and_announce_winner()
 
             elif request_type == OPPN_OP:
                 if self.gamestate.actual_player() == 0:

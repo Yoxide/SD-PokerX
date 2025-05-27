@@ -1,6 +1,8 @@
+import json
+
 import pygame
 from client.stub import interface as processar, INT_SIZE
-from client.stub import OK_OP, CON_OP, HAND_OP, NAME_OP
+from client.stub import OK_OP, CON_OP, HAND_OP, NAME_OP, RETRY_OP
 from time import sleep
 
 CARD_WIDTH, CARD_HEIGHT = 55, 80
@@ -206,14 +208,22 @@ class User:
                         self.processar.pass_turn()
                         self.display_gui(hand, community_cards, "Passaste!")
                         self.turn += 1
-            elif res == 2:
-                community_cards = self.processar.receive_object()
+
+            elif res == 2 or self.turn == 3:
+                try:
+                    community_cards = self.processar.receive_object()
+                except (json.JSONDecodeError, TypeError):
+                    self.processar.send_str(RETRY_OP)
+                    community_cards = self.processar.receive_object()
+
                 result = self.processar.receive_str(100)
                 self.display_gui(hand, community_cards, result)
-                sleep(3)
+                sleep(10)
                 break
+
             else:
                 sleep(1)
+
 
         pygame.mixer.music.stop()
         pygame.quit()
